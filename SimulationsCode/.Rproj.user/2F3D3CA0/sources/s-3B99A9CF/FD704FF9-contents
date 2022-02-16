@@ -1,0 +1,71 @@
+library(graphsim)
+
+library(igraph)
+
+network<-erdos.renyi.game(n=50,p.or.m=0.05,type="gnp",directed=FALSE,loops=FALSE)
+networkm<-as_adjacency_matrix(network,type="both",sparse=FALSE)
+weights<-matrix(rbeta(n=50^2,shape1=1.5,shape2=5),nr=50,nc=50)
+
+network2m<-networkm*weights
+
+network2<-graph.adjacency(network2m,mode="undirected",weighted=TRUE)
+E(network2)$weight<-1/E(network2)$weight
+#plot(network2)
+
+test_data <- generate_expression(n=100, network2, state="activating", cor = 0.99,sd=1,dist=TRUE)
+hist(test_data)
+par(mfrow=c(1,1),mar=c(0,0,0,0))
+plot(network2,vertex.label=NA,vertex.size=10+test_data[,1]*3)
+
+sigma_mat<-make_sigma_mat_dist_graph(network2)
+
+par(mfrow=c(1,1),mar=c(5,5,2,2))
+hist(sigma_mat)
+
+cor<-which(sigma_mat==0.8,arr.ind=T)
+length(network2m[cor])
+sum(network2m>0)
+
+library(gplots)
+heatmap.2(test_data, scale = "none", trace = "none",
+          col = colorpanel(50, "blue", "white", "red"))
+# correlations
+heatmap.2(cor(t(test_data)),
+          scale = "none", trace = "none",
+          col = colorpanel(50, "white", "red"))
+# expected correlations (\eqn{\Sigma})
+sigma_matrix <- make_sigma_mat_graph(network2, cor = 0.8)
+heatmap.2(make_sigma_mat_graph(network2, cor = 0.8),
+          scale = "none", trace = "none",
+          col = colorpanel(50, "white", "red"))
+
+
+################################
+################################
+
+# construct a synthetic graph network
+graph_structure_edges <- rbind(c("A", "C"), c("B", "C"), c("C", "D"), c("D", "E"),
+                               c("D", "F"), c("F", "G"), c("F", "I"), c("H", "I"))
+graph_structure <- graph.edgelist(graph_structure_edges, directed = TRUE)
+# compute a simulated dataset for toy network
+# n = 250 samples
+# state = edge_state (properties of each edge)
+# cor = 0.95 max correlation between samples
+# absolute = FALSE (geometric distance by default)
+edge_state <- c(1, 1, -1, 1, 1, 1, 1, -1)
+structure_data <- generate_expression(250, graph_structure,
+                                      state = edge_state, cor = 0.95)
+##' # visualise matrix
+library("gplots")
+# expression data
+heatmap.2(structure_data, scale = "none", trace = "none",
+          col = colorpanel(50, "blue", "white", "red"))
+# correlations
+heatmap.2(cor(t(structure_data)), scale = "none", trace = "none",
+          col = colorpanel(50, "blue", "white", "red"))
+# expected correlations (\eqn{\Sigma})
+sigma_matrix <- make_sigma_mat_graph(graph_structure,
+                                     state = edge_state, cor = 0.8)
+heatmap.2(make_sigma_mat_graph(graph_structure,
+                               state = edge_state, cor = 0.8),scale = "none", trace = "none",
+          col = colorpanel(50, "blue", "white", "red"))

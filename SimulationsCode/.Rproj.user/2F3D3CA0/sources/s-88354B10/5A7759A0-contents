@@ -1,0 +1,55 @@
+effs<-list()
+
+effs[[1]]<-matrix(c(0,0,0,1,1,1,0,0),nr=1,nc=8)
+effs[[1]]<-rbind(rep(0,8),effs[[1]])
+effs[[2]]<-matrix(c(0,0,0,0,0,0,-2,-2),nr=1,nc=8)
+
+
+beta_mean<-0.1
+beta_var<-0.02
+
+#mean=a/(a+b)
+#var=ab/(((a+b)^2)*(a+b+1))
+
+fn_sol<-function(a,b){
+  mean<-a/(a+b)
+  var<-(a*b)/(((a+b)^2)*(a+b+1))
+  return(c(mean,var))
+}
+
+fn_sol2 <- function(x) crossprod( fn_sol(x[1], x[2]) - c(0.1, 0.5))
+answer<-optim(c(1, 1), fn_sol2)
+
+answer$par
+
+hist(rbeta(10000,answer$par[1],answer$par[2]))
+
+library(nleqslv)
+
+fn_sol <- function(x) {
+  
+  mean <- x[1]/(x[1]+x[2]) - beta_mean
+  var <- (x[1]*x[2])/(((x[1]+x[2])^2)*(x[1]+x[2]+1)) - beta_var
+  
+  return(c(mean, var))
+  
+}
+
+ans<-nleqslv(c(1,5), fn_sol)
+par(mfrow=c(1,1),mar=c(5,5,2,2))
+hist(rbeta(10000,ans$x[1],ans$x[2]))
+
+mean(rbeta(10000,ans$x[1],ans$x[2]))
+var(rbeta(10000,ans$x[1],ans$x[2]))
+
+mean(rbeta(10000,1.5,5))
+var(rbeta(10000,1.5,5))
+
+
+
+var(rbeta(10000,0.001,0.001))
+mean(rbeta(10000,0.001,0.001))
+hist(rbeta(10000,0.001,0.001))
+hist(rbeta(10000,0.1,1))
+mean(rbeta(10000,0.1,1))
+var(rbeta(10000,0.1,1))

@@ -28,7 +28,7 @@ for(i in 1:(n-1)){
     }
     if(indiv_data$groups[i]!=indiv_data$groups[j]){
       t_e1<-rbinom(1,1,p_og*(1/d_effp)^dist_mat[i,j])
-      t_e2<-rbeta(1,w_og1,w_og2)*(1/d_effp)^dist_mat[i,j]
+      t_e2<-rbeta(1,w_og1,w_og2)*(1/d_effw)^dist_mat[i,j]
       pop_mat[i,j]<-pop_mat[j,i]<-t_e1*t_e2
     }
   }

@@ -1,0 +1,77 @@
+#function to go through networks an rewire them
+#feed in individual probabilities of rewiring
+#local density effect on rewiring
+
+rewire<-function(network,indiv.info,group.locs,group.sizes,group.sizes.prev,rewire.probs,dens.probs,i.eff,o.eff,d.eff){
+
+#calculate distance matrix for all individuals
+dm<-as.matrix(dist(data.frame(group.locs[,2:3])))
+
+dm.0<-dm
+dm.1<-dm
+dm.2<-dm
+
+for(i in 1:nrow(dm)){
+for(j in 1:nrow(dm)){
+ifelse(dm[i,j]==0,dm.0[i,j]<-dens.probs[1],dm.0[i,j]<-0)
+ifelse(dm[i,j]>0&dm[i,j]<=bound.1,dm.1[i,j]<-dens.probs[2],dm.1[i,j]<-0)
+ifelse(dm[i,j]>bound.1&dm[i,j]<=bound.2,dm.2[i,j]<-dens.probs[3],dm.2[i,j]<-0)
+}
+}
+
+dyn.groups<-group.sizes-group.sizes.prev
+dyn.groups[dyn.groups>0]<-0
+dyn.groups<-abs(dyn.groups)
+
+t.effs<-rowSums((dm.0*dyn.groups)+(dm.1*dyn.groups)+(dm.2*dyn.groups))
+
+#work out rewire.probs2 using rewire.probs and dens.probs
+
+rewire.probs2<-rewire.probs
+for(i in 1:length(rewire.probs2)){
+rewire.probs2[i]<-rewire.probs2[i]+t.effs[indiv.info$Group[i]]
+}
+
+
+rw.effs<-data.frame((i.eff*dyn.groups),(o.eff*dyn.groups),(d.eff*dyn.groups))
+
+#work out rewire.effect
+rewire.effs<-matrix(0,nrow(indiv.info),nc=3)
+for(i in 1:nrow(rewire.effs)){
+rewire.effs[i,]<-as.numeric(as.vector(rw.effs[indiv.info$Group[i],]))
+}
+
+
+rw<-rbern(nrow(indiv.info),rewire.probs2)
+
+rw.ids<-which(rw==1)
+
+rw.ids2<-sample(rw.ids,length(rw.ids),replace=FALSE)
+
+if(length(rw.ids2)>0){
+for(i in 1:length(rw.ids2)){
+ for(j in ncol(network)){
+  if(i!=j){
+   if(indiv.info$Group[rw.ids2[i]]==indiv.info$Group[j]){
+    tmp<-0.5*(p.ig.f+(indiv.info$SEX[rw.ids2[i]])*p.ig.m+(indiv.info$BR[rw.ids2[i]])*p.ig.br+(rewire.effs[rw.ids2[i],1])+p.ig.f+(indiv.info$SEX[j])*p.ig.m+(indiv.info$BR[j])*p.ig.br)
+    network[rw.ids2[i],j]<-rbern(1,tmp)
+   }
+
+   if(indiv.info$Group[rw.ids2[i]]!=indiv.info$Group[j]){
+    tmp.d<-dist(group.locs[c(indiv.info$Group[rw.ids2[i]],indiv.info$Group[j]),2:3])
+    tmp<-(0.5*((p.og.f+(indiv.info$SEX[rw.ids2[i]])*p.og.m+(indiv.info$BR[rw.ids2[i]])*p.og.br+(rewire.effs[rw.ids[i],2]))+(p.og.f+(indiv.info$SEX[j])*p.og.m+(indiv.info$BR[j])*p.og.br)))*exp((dist.eff+rewire.effs[rw.ids2[i],3])*tmp.d)
+    network[rw.ids2[i],j]<-rbern(1,tmp)
+   }
+
+   network[j,rw.ids2[i]]<-network[rw.ids2[i],j]
+
+  }
+ }
+}
+}
+
+diag(network)<-0
+
+return(network)
+
+} #end function
