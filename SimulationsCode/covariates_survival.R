@@ -1,33 +1,16 @@
 ##to do - community effect on survival?
 #         network covariance effect on survival
 
-library(Matrix)
-library(MASS)
-
 covariates_survival<-function(indiv_data,indiv_info,network,
                               group_means=NULL,
                               ext_vars=NULL,ext_effs,scale_ext=TRUE,
                               net_vars=NULL,net_effs,net_packages,scale_net=TRUE,
-                              net_cov=FALSE,max_cor=0.8,covMat_check=FALSE,
+                              net_cov=FALSE,cov_steps,cov_eff,
                               mps,lvps){
   
   lmps<-car::logit(mps,adjust=0.001)
   
-  if(net_cov==FALSE){
-    t_survival<-rnorm(nrow(indiv_data),lmps,lvps)
-  }
-  if(net_cov==TRUE){
-    networkB<-network/max(network)
-    corMat<-max_cor*networkB
-    diag(corMat)<-1
-    stddev<-rep(lvps^0.5,nrow(indiv_data))
-    covMat <- stddev %*% t(stddev) * corMat
-    covMat2<-as.matrix(Matrix::nearPD(covMat)$mat)
-    if(covMat_check==TRUE){
-      print(summary(netlm(y=covMat2,x=covMat)))
-    }
-    t_survival <- mvrnorm(n = 1, mu = rep(lmps,nrow(indiv_data)), Sigma = covMat2, empirical = FALSE)
-  }
+  t_survival<-rnorm(nrow(indiv_data),lmps,lvps)
   
   if(is.vector(group_means)){
     t_survival<-t_survival+group_means[indiv_data$groups]
@@ -76,7 +59,6 @@ covariates_survival<-function(indiv_data,indiv_info,network,
       if(is.na(net_packages[i])==FALSE&net_packages[i]=="tnet"){
         network2<-tnet::as.tnet(network,type="weighted one-mode tnet")
         met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network2)")))
-        met<-met[,ncol(met)]
       }
       
       if(scale_net==FALSE){
@@ -86,6 +68,15 @@ covariates_survival<-function(indiv_data,indiv_info,network,
         t_survival<-t_survival+net_effs[[i]]*scale(met)
       }
       
+    }
+  }
+  
+  if(cov==TRUE){
+    network2<-graph.adjacency(network,mode="undirected",weighted=TRUE)
+    t_add<-numeric()
+    for(i in 1:nrow(indiv_data)){
+      e_net<-igraph::make_ego_graph(network2,order=cov_steps,nodes=i)
+      ego_size(network2, order = cov_steps, nodes=i)
     }
   }
   
