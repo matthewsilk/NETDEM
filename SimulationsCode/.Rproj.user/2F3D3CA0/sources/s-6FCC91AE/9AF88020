@@ -3,7 +3,7 @@
     "path": "C:/Users/matth/Dropbox/MSCA_Fellowship/GitHub/SimulationsCode/covariates_survival.R",
     "project_path": "covariates_survival.R",
     "type": "r_source",
-    "hash": "2330018495",
+    "hash": "768532746",
     "contents": "",
     "dirty": false,
     "created": 1646128226752.0,
@@ -13,15 +13,15 @@
         "tempName": "Untitled2",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "3,0",
+        "cursorPosition": "0,0",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1646128479,
+    "lastKnownWriteTime": 1646128649,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1646128479664,
+    "last_content_update": 1646128649334,
     "read_only": false,
     "read_only_alternatives": []
 }

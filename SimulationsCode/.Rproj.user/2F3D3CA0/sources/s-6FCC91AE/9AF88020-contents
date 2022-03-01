@@ -1,8 +1,5 @@
-+##to do - community effect on survival?
+##to do - community effect on survival?
   #         network covariance effect on survival
-  
-library(Matrix)
-library(MASS)
 
 covariates_survival<-function(indiv_data,indiv_info,network,
                               group_means=NULL,

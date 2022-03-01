@@ -9,6 +9,8 @@ library(sna)
 library(tnet)
 library(car)
 library(boot)
+library(Matrix)
+library(MASS)
 
 #Source required functions
 source("get_network2.R")
