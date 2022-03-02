@@ -74,13 +74,26 @@ covariates_survival<-function(indiv_data,indiv_info,network,
         network2<-tnet::as.tnet(network,type="weighted one-mode tnet")
         met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network2)")))
         met<-met[,ncol(met)]
+        if(length(met)<nrow(network)){
+          met<-c(met,rep(0,(nrow(network)-length(met))))
+        }
+      }
+      
+      #Convert indivs with NA for clustering coefficient to have clustering coefficient of 0
+      if(net_vars[i]%in%c("clustering_local_w","clustering_local","transitivity")){
+        met[is.na(met)]<-0
       }
       
       if(scale_net==FALSE){
         t_survival<-t_survival+net_effs[[i]]*met
       }
       if(scale_net==TRUE){
-        t_survival<-t_survival+net_effs[[i]]*scale(met)
+        if(sd(met,na.rm=TRUE)>0){
+          t_survival<-t_survival+net_effs[[i]]*scale(met)
+        }
+        if(sd(met,na.rm=TRUE)==0){
+          t_survival<-t_survival+net_effs[[i]]*(met-mean(met))
+        }
       }
       
     }
