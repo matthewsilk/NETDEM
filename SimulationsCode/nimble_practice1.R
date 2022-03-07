@@ -128,6 +128,7 @@ indiv_info<-data.frame(indiv_data$indivs)
 indiv_info<-indiv_info_gen(indiv_info,ii_tag=NULL,indiv_data=indiv_data,trait="sex",trait_type="fac",level_names=c("M","F"))
 indiv_info<-indiv_info_gen(indiv_info[[1]],ii_tag=indiv_info[[2]],indiv_data,trait="size",trait_type="cov",x_dist="norm")
 
+start_info<-indiv_info
 
 #Generate first network
 effs<-list()
@@ -146,8 +147,8 @@ pop_net<-net_info[[2]]
 
 ##Step two: iterate over behavioural and demographic time steps
 
-beh_steps<-10
-dem_steps<-8
+beh_steps<-5
+dem_steps<-5
 
 CG<-list()
 OG<-list()
@@ -158,6 +159,8 @@ inds_alive<-list()
 pre_cap<-NULL
 
 ts_surv<-numeric()
+
+cluclo<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
 
 for(ds in 1:dem_steps){
   
@@ -190,15 +193,15 @@ for(ds in 1:dem_steps){
   #Observe networks over these timesteps
   if(ds==1){
     obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                          pcg=0.1,pmi=0.75,pci=0.75,
-                          start_obs=1,end_obs=max(samp_wind),interval_obs=2,
+                          pcg=0.5,pmi=0.9,pci=0.9,
+                          start_obs=1,end_obs=max(samp_wind),interval_obs=1,
                           start_cap=1,end_cap=2,interval_cap=1,
                           pre_cap=NULL)
   }
   if(ds>1){
     obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                          pcg=0.1,pmi=0.75,pci=0.75,
-                          start_obs=1,end_obs=max(samp_wind),interval_obs=2,
+                          pcg=0.5,pmi=0.9,pci=0.9,
+                          start_obs=1,end_obs=max(samp_wind),interval_obs=1,
                           start_cap=1,end_cap=2,interval_cap=1,
                           pre_cap=pre_cap_t2)
   }
@@ -225,12 +228,27 @@ for(ds in 1:dem_steps){
   
   network<-get_network2(gbi)
   
+  network_obs<-get_network2(observed_gbi)
+  
+  clu_tmp<-clustering_local_w(as.tnet(network_obs))
+  clu_tmp<-clu_tmp[,ncol(clu_tmp)]
+  if(length(clu_tmp)<nrow(network)){
+    clu_tmp<-c(clu_tmp,rep(NaN,(nrow(network)-length(clu_tmp))))
+  }
+  if(sum(is.na(clu_tmp)&colSums(observed_gbi)>0)>0){
+    clu_tmp[is.na(clu_tmp)&colSums(observed_gbi)>0]<-0
+  }
+  
+  cluclo[indiv_data$indivs,ds]<-clu_tmp
+  
   indiv_data<-covariates_survival(indiv_data=indiv_data,indiv_info=indiv_info,network=network,
                                   group_means=NULL,
                                   ext_vars="sex",ext_effs=list(c(0,-1)),scale_ext=FALSE,
                                   net_vars="clustering_local_w",net_effs=list(0.25),net_packages="tnet",scale_net=TRUE,
                                   net_cov=TRUE,max_cor=-0.9,
                                   mps=0.8,lvps=0.5)
+  
+  boxplot(indiv_data$survival~indiv_info[[1]]$sex)
   
   ts_surv[ds]<-mean(indiv_data$survival,na.rm=TRUE)
   
@@ -364,3 +382,133 @@ MCMCsummary(mcmc.output, round = 2)
 
 
 
+################################################
+################################################
+
+hmm.survival2 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  p ~ dunif(0, 1) # prior detection
+  # likelihood
+
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    logit(phi[i]) <- beta[sex[i]]
+    gamma[1,1,i] <- phi[i]      # Pr(alive t -> alive t+1)
+    gamma[1,2,i] <- 1 - phi[i]  # Pr(alive t -> dead t+1)
+    gamma[2,1,i] <- 0           # Pr(dead t -> alive t+1)
+    gamma[2,2,i] <- 1           # Pr(dead t -> dead t+1)
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1))
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(2,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits)
+
+parameters.to.save <- c("beta","p")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival2,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
+
+###########################################
+###########################################
+
+hmm.survival3 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  beta[3] ~ dnorm(mean=0,sd=10)
+  p ~ dunif(0, 1) # prior detection
+  # likelihood
+  
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    for(j in 1:(T-1)){
+      logit(phi[i]) <- beta[sex[i]]+beta[3]*cluclo[i,j]
+      gamma[1,1,i,j] <- phi[i]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i]  # Pr(alive t -> dead t+1)
+      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
+      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
+    }
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),cluclo=cluclo)
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(3,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits)
+
+parameters.to.save <- c("beta","p")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival2,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
