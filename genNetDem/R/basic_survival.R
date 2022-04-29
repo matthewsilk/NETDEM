@@ -11,6 +11,6 @@
 
 basic_survival<-function(indiv_data,mps,lvps){
   lmps<-car::logit(mps,adjust=0.001)
-  indiv_data$survival<-inv.logit(rnorm(nrow(indiv_data),lmps,lvps))
+  indiv_data$survival<-boot::inv.logit(stats::rnorm(nrow(indiv_data),lmps,lvps))
   return(indiv_data)
 }

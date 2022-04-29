@@ -2,27 +2,43 @@
 #'
 #'Generates observations that can be used to generate CMR data and observed social networks.
 #'
+#'@param samp_wind vector recording which groups correspond to which sampling windows/behavioural timesteps.
+#'@param gbi the true group-by-individual matrix
+#'@param pcg probability of observing or capturing a group in a sampling window with observations/captures
+#'@param pmi the probability of an individual being observed in a sampled group
+#'@param pci the probability of an individual being captured in a sampled group
+#'@param start_obs start of sequence of observed sampling windows
+#'@param end_obs end of sequence of observed sampling windows
+#'@param interval_obs sampling window interval between start_obs and end_obs
+#'@param start_cap start of sequence of sampling windows with captures
+#'@param end_cap end of sequence of sampling windows with captures
+#'@param interval_cap sampling window interval between start_cap and end_cap
+#'@param pre_cap vector indicating whether any individuals have been previously captured (and so are observable). Defaults to NULL.
+#'@details Note that observations do not happen in the same sampling windows as captures even if defined to do so. Only previously captured individuals are observable. See notes in comments for future updates. I would also like to allow some observation error in another version of this function.
+#'@return A list with 4 elements: A) the full GBI but for only captured groups; B) a vector indicating which groups were captured ; C) the full GBI for observed and captured groups combined; D) a vector indicating which groups were observed
+#'
+#'@export
 
 cap_and_obs<-function(samp_wind,gbi=gbi,
                       pcg=0.5,pmi=0.9,pci=0.9,
                       start_obs=1,end_obs=max(samp_wind),interval_obs=5,
                       start_cap=1,end_cap=21,interval_cap=2,
                       pre_cap=NULL){
-  
+
   n_samp_wind<-length(unique(samp_wind))
   samp_wind_size<-table(samp_wind)
-  
+
   cap_winds<-seq(start_cap,end_cap,interval_cap)
   obs_winds<-seq(start_obs,end_obs,interval_obs)
-  
+
   gbi_o<-NULL
   gbi_c<-NULL
-  
+
   gbi2<-gbi
-  
+
   #rm(c_grs)
   #rm(o_grs)
-  
+
   for(sw in 1:n_samp_wind){
     if(sw%in%cap_winds){
       gbi_t<-gbi2[samp_wind==sw,]
@@ -97,7 +113,7 @@ cap_and_obs<-function(samp_wind,gbi=gbi,
       }
     }
   }
-  
+
   gbi_c2<-array(0,dim=dim(gbi2))
   if(exists("c_grs")){gbi_c2[c_grs,]<-gbi_c}
   gbi_c3<-sign(apply(gbi_c2,2,cumsum))
@@ -113,48 +129,17 @@ cap_and_obs<-function(samp_wind,gbi=gbi,
     gbi_o3[o_grs,]<-gbi_o2
   }
   gbi_o4<-gbi_o3+gbi_c2
-  
+
   if(!exists("c_grs")){c_grs<-NULL}
   if(!exists("o_grs")){o_grs<-NULL}
-  
+
   #May need to adjust output to save some of these alternative matrices
   output<-list(gbi_c2,c_grs,gbi_o4,o_grs)
-  
+
   return(output)
-  
+
 }
 
-obs_net_checker<-function(gbi_o,full_mat,pop_mat){
-  
-  gbi_o<-gbi_o[rowSums(gbi_o)>0,]
-  
-  obs_mat<-get_network2(gbi_o)
-  obs_net<-graph.adjacency(obs_mat,mode="undirected",weighted=TRUE)
-  
-  #Plot network
-  par(mar=c(0,0,0,0),mfrow=c(1,1))
-  plot(obs_net,vertex.label=NA,vertex.size=8,edge.width=(E(obs_net)$weight*2)^1.5)
-  
-  #Check correlation with actual network
-  cor_check<-netlm(obs_mat,full_mat,nullhyp="qapspp")
-  summary(cor_check)
-  
-  #Check correlation with underlying network
-  cor_check2<-netlm(obs_mat,pop_mat,nullhyp="qapspp")
-  summary(cor_check2)
-  
-  #Plot centrality correlations with actual network
-  par(mfrow=c(2,2))
-  par(mar=c(5,5,2,2))
-  plot(igraph::degree(obs_net)~igraph::degree(full_net))
-  plot(igraph::strength(obs_net)~igraph::strength(full_net))
-  plot(igraph::betweenness(obs_net,weights=1/E(obs_net)$weight)~igraph::betweenness(full_net,weights=1/E(full_net)$weight))
-  plot(igraph::closeness(obs_net,weights=1/E(obs_net)$weight)~igraph::closeness(full_net,weights=1/E(full_net)$weight))
-  
-}
 
-# pcg = probability of capturing a gathering
-# pmi = probability of marking/tagging an individual in a gathering on first capture
-# pci = probability of capturing/observing an individual within a gathering
 
 
