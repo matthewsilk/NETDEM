@@ -1,0 +1,8 @@
+library(igraph)
+
+g<-erdos.renyi.game(n=100,p.or.m=0.1,type="gnp",directed=TRUE,loops=FALSE)
+g2<-graph.adjacency(t(as_adjacency_matrix(g,sparse=FALSE)),mode="directed")
+
+plot(page_rank(g2)$vector~page_rank(g)$vector)
+
+plot(page_rank(g)$vector~degree(g,mode="in"))

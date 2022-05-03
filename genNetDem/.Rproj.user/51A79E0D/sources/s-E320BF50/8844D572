@@ -1,14 +1,14 @@
 {
-    "id": "B3CB4BF5",
-    "path": "~/GitHub/NETDEM/README.md",
+    "id": "8844D572",
+    "path": "~/GitHub/NETDEM/SimulationsCode/example_script5.R",
     "project_path": null,
-    "type": "markdown",
-    "hash": "2230411130",
+    "type": "r_source",
+    "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1651223281236.0,
+    "created": 1651495778995.0,
     "source_on_save": false,
-    "relative_order": 1,
+    "relative_order": 6,
     "properties": {
         "source_window_id": "",
         "Source": "Source"
