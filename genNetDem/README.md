@@ -22,7 +22,7 @@ can be downloaded by adding `build_vignettes = TRUE`.
 
 ``` r
 # install genNetDem
-remotes::install_github("matthewsilk/NETDM/genNetDem", build_vignettes = TRUE)
+remotes::install_github("matthewsilk/NETDEM/genNetDem", build_vignettes = TRUE)
 ```
 
 ## Getting started
