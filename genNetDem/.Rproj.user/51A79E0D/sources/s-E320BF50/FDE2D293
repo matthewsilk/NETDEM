@@ -3,7 +3,7 @@
     "path": "~/GitHub/NETDEM/genNetDem/vignettes/using_genNetDem.Rmd",
     "project_path": "vignettes/using_genNetDem.Rmd",
     "type": "r_markdown",
-    "hash": "2300387346",
+    "hash": "873923475",
     "contents": "",
     "dirty": false,
     "created": 1651495347053.0,
@@ -13,16 +13,16 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "13,14",
+        "cursorPosition": "3,22",
         "scrollLine": "0",
         "last_setup_crc32": ""
     },
     "folds": "",
-    "lastKnownWriteTime": 1651581376,
+    "lastKnownWriteTime": 1651582479,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1651581376263,
+    "last_content_update": 1651582479453,
     "read_only": false,
     "read_only_alternatives": []
 }
