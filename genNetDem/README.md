@@ -21,7 +21,7 @@ bugs or suggestions in the
 can be downloaded by adding `build_vignettes = TRUE`.
 
 ``` r
-# install CMRnet
+# install genNetDem
 remotes::install_github("matthewsilk/NETDM/genNetDem", build_vignettes = TRUE)
 ```
 
