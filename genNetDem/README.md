@@ -3,7 +3,7 @@
 
 # **genNetDem**
 
-**genNetDem** is an R package that that generates longitudinal social
+**genNetDem** is an R package that generates longitudinal social
 network and/or capture-recapture datasets with known underlying
 properties.
 
