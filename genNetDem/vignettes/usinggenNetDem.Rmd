@@ -1,10 +1,10 @@
 ---
-title: "Using genNetDem"
+title: "usinggenNetDem"
 author: "Matthew Silk"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{usinggenNetDem}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
