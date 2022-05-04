@@ -49,11 +49,10 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
     if(grs[i]>1){
       for(j in 2:grs[i]){
         can_join<-t_data[-which(t_data%in%t_g)]
-        t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),order(can_join)]
+        t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),sort(can_join)]
         if(is.vector(t_mat)){
           join_probs<-t_mat+float
-        }
-        else{
+        } else{
           join_probs<-apply(t_mat,2,jpc,par=par,float=float)^pow
         }
         if(length(can_join)>1){
@@ -66,7 +65,6 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
     }
     gbi2[i,which(sort(indiv_data$indivs)%in%t_g)]<-1
     t_data<-t_data[-which(t_data%in%t_g)]
-    
   }
   
   samp_wind<-rep(1,nrow(gbi2))
@@ -87,11 +85,10 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
       if(grs[i]>1){
         for(j in 2:grs[i]){
           can_join<-t_data[-which(t_data%in%t_g)]
-          t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),order(can_join)]
+          t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),sort(can_join)]
           if(is.vector(t_mat)){
             join_probs<-t_mat+float
-          }
-          else{
+          } else{
             join_probs<-apply(t_mat,2,jpc,par=par,float=float)^pow
           }
           if(length(can_join)>1){

@@ -34,7 +34,7 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
     if(grs[i]>1){
       for(j in 2:grs[i]){
         can_join<-t_data[-which(t_data%in%t_g)]
-        t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),sort(can_join)]
+        t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),order(can_join)]
         if(is.vector(t_mat)){
           join_probs<-t_mat+float
         } else{
@@ -71,7 +71,7 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
       if(grs[i]>1){
         for(j in 2:grs[i]){
           can_join<-t_data[-which(t_data%in%t_g)]
-          t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),sort(can_join)]
+          t_mat<-pop_mat[which(sort(indiv_data$indivs)%in%t_g),order(can_join)]
           if(is.vector(t_mat)){
             join_probs<-t_mat+float
           } else{
