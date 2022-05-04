@@ -21,15 +21,15 @@ source("cap_dat_gen.R")
 ###################################################
 
 #Generate population
-pop_info<-population_generation_basic(n=100,ng=100)
+pop_info<-population_generation_basic(n=100,ng=10)
 indiv_data<-pop_info[[1]]
 dist_mat<-pop_info[[2]]
 
 #Generate first network
 net_info<-network_generation_basic(indiv_data=indiv_data,dist_mat=dist_mat,
-                                   p_ig=0.1,w_ig1=1.5,w_ig2=5,
-                                   p_og=0.1,w_og1=1,w_og2=5,
-                                   d_effp=4,d_effw=4,
+                                   p_ig=1,w_ig1=1.5,w_ig2=5,
+                                   p_og=0,w_og1=1,w_og2=5,
+                                   d_effp=8,d_effw=4,
                                    plot=TRUE)
 pop_mat<-net_info[[1]]
 pop_net<-net_info[[2]]
@@ -37,7 +37,7 @@ pop_net<-net_info[[2]]
 #Sample over some behaviour only time steps
 int_info<-interaction_generation_simul(indiv_data=indiv_data,pop_mat=pop_mat,
                                        mean_group_size=2,n_ts=20,
-                                       float=0.000000000000000001,par=50,pow=4)
+                                       float=0.0000001,par=500,pow=10)
 gbi<-int_info[[1]]
 samp_wind<-int_info[[2]]
 

@@ -22,24 +22,16 @@ population_generation_basic<-function(n,ng,plot=TRUE){
   if(n==ng){
     groups<-indivs
   }
-  if(n<ng){
+  if(n>ng){
     print("invalid number of groups")
   }
-  if(n>ng){
+  if(n<ng){
     groups<-sample(seq(1,ng,1),n,replace=TRUE)
   }
 
   #Locations
-  x1<-stats::runif(ng,0,1)
-  y1<-stats::runif(ng,0,1)
-
-  x<-numeric()
-  y<-numeric()
-
-  for(i in 1:n){
-    x[i]<-x1[groups[i]]
-    y[i]<-y1[groups[i]]
-  }
+  x<-stats::runif(ng,0,1)
+  y<-stats::runif(ng,0,1)
 
   #Check locations
   if(plot==TRUE){

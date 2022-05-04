@@ -1,26 +1,27 @@
 {
-    "id": "B766DAF7",
+    "id": "9925E8BD",
     "path": "~/GitHub/NETDEM/genNetDem/vignettes/usinggenNetDem.Rmd",
     "project_path": "vignettes/usinggenNetDem.Rmd",
     "type": "r_markdown",
-    "hash": "2242003340",
+    "hash": "0",
     "contents": "",
-    "dirty": false,
-    "created": 1651582918281.0,
+    "dirty": true,
+    "created": 1651652268007.0,
     "source_on_save": false,
-    "relative_order": 8,
+    "relative_order": 9,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "3,22",
-        "scrollLine": "0"
+        "cursorPosition": "125,0",
+        "scrollLine": "111",
+        "last_setup_crc32": "E320BF502ebc63b1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1651582949,
+    "lastKnownWriteTime": 1651652968,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1651582949304,
+    "last_content_update": 1651652986065,
     "read_only": false,
     "read_only_alternatives": []
 }
