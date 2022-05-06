@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
   fig.height=6)
 ```
 
-### Here we provide an overview of how to use the `covariates_survival` to flexibly simulate survival probabilities that depend on extrinsic and network traits.
+### Here we provide an overview of how to use the `covariates_survival()` function to flexibly simulate survival probabilities that depend on extrinsic and network traits.
 
 ***
 
