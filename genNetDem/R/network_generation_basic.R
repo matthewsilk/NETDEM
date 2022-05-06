@@ -30,10 +30,10 @@ if(is.dataframe(indiv_data)==FALSE){stop("Correctly formatted indiv_data is requ
 if(ncol(indiv_data)!=4){stop("Correctly formatted indiv_data is required")}
 if(is.matrix(dist_mat)==FALSE){stop("Distance matrix must be in matrix format")}
 if(dim(dist_mat)[1]!=dim(dist_mat)[2]){stop("Distance matrix not square")}
-if(p_ig<0){stop("p_ig must be greater than zero")}
+if(p_ig<0|p_ig>1){stop("p_ig must be between zero and one")}
 if(w_ig1<0){stop("w_ig1 must be greater than zero")}
 if(w_ig2<0){stop("w_ig2 must be greater than zero")}
-if(p_og<0){stop("p_og must be greater than zero")}
+if(p_og<0|p_og>1){stop("p_og must be between zero and one")}
 if(w_og1<0){stop("w_og1 must be greater than zero")}
 if(w_og2<0){stop("w_og2 must be greater than zero")}
 

@@ -3,7 +3,7 @@
     "path": "~/GitHub/NETDEM/genNetDem/vignettes/usinggenNetDem.Rmd",
     "project_path": "vignettes/usinggenNetDem.Rmd",
     "type": "r_markdown",
-    "hash": "1487653730",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1651750940530.0,
@@ -12,8 +12,8 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "44,0",
-        "scrollLine": "36",
+        "cursorPosition": "235,0",
+        "scrollLine": "235",
         "last_setup_crc32": "28EE7E622ebc63b1"
     },
     "folds": "",
