@@ -22,8 +22,8 @@ indiv_info_gen<-function(indiv_info,ii_tag=NULL,indiv_data,trait,trait_type=c("c
   if(is.data.frame(indiv_data)==FALSE){stop("Correctly formatted indiv_data is required")}
   if(ncol(indiv_data)!=4){stop("Correctly formatted indiv_data is required")}
   if(is.data.frame(indiv_info)==FALSE){stop("the indiv_info dataframe is required [not the full object]")}
-  if(trait_type%in%c("cov","fac")==FALSE){stop("trait_type must be either 'cov' or 'fac'")}
-  if(x_dist%in%c("unif","norm","lnorm")==FALSE){stop("trait_type must be either 'unif' or 'norm' or 'lnorm'")}
+  if(trait_type%in%c("cov","fac")){stop("trait_type must be either 'cov' or 'fac'")}
+  if(x_dist%in%c("unif","norm","lnorm")){stop("trait_type must be either 'unif' or 'norm' or 'lnorm'")}
 
   names(indiv_info)[1]<-"ID"
   n_obs<-nrow(indiv_info)
