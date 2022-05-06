@@ -91,6 +91,8 @@ int_info<-interaction_generation_simul(indiv_data=indiv_data,pop_mat=pop_mat,
 gbi<-int_info[[1]]
 samp_wind<-int_info[[2]]
 
+network<-asnipe::get_network(gbi)
+
 ```
 
 ***
@@ -100,8 +102,6 @@ samp_wind<-int_info[[2]]
 *Example 1* &mdash &#8212 survival probability is influenced by two variables: a) a moderate positive effect of size (+0.2); and b) a stronger negative effect of degree (-0.5)
 
 ```{r surv1, message=FALSE,warning=FALSE}
-
-network<-get_network2(gbi)
 
 #Add survival to initial population
 indiv_data<-covariates_survival(indiv_data=indiv_data,indiv_info=indiv_info,network=network,
