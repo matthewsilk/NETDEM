@@ -1,2 +1,0 @@
-"0","plot(indiv_data$survival~indiv_info[[1]]$size,ylab=""Survival Prob"",xlab=""Size"")"
-"0",""

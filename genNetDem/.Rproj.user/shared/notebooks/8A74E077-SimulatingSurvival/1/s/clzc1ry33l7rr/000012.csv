@@ -8,5 +8,5 @@
 "0","                                mps=0.95,lvps=0.5)"
 "0",""
 "0","#Plots to demonstrate the function is working."
-"0","par(mfrow=c(1,1))"
-"0","plot(indiv_data$survival~colSums(sign(network)),ylab=""Survival Prob"",xlab=""Degree"")"
+"0","par(mfrow=c(1,1),mar=c(5,5,2,2))"
+"0","plot(indiv_data$survival~colSums(sign(network)),ylab=""Survival Prob"",xlab=""Degree"",cex.lab=1.5,cex.axis=1.15,las=1,pch=16,col=adjustcolor(""black"",0.5))"
