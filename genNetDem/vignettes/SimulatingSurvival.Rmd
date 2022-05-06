@@ -132,7 +132,7 @@ indiv_data<-covariates_survival(indiv_data=indiv_data,indiv_info=indiv_info,netw
 #Plots to demonstrate the two types of variable are working.
 #At least in this case
 par(mfrow=c(1,1))
-plot(indiv_data$survival~tnet::betweenness_w(tnet::as.tnet(network)),ylab="Survival Prob",xlab="Betweenness")
+plot(indiv_data$survival~tnet::betweenness_w(tnet::as.tnet(network))[,1],ylab="Survival Prob",xlab="Betweenness")
 boxplot(indiv_data$survival~indiv_info[[1]]$sex,ylab="Survival Prob",xlab="Sex")
 
 ```
