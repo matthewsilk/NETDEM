@@ -241,11 +241,11 @@ for(i in 1:nrow(pars2)){
 
     #Demographic timestep
     if(ds==1){
-      new_info<-timestep_demographics(indiv_data=indiv_data,full_indiv_data=indiv_data,recruitment=FALSE,
+      new_info<-timestep_demographics(indiv_data=indiv_data,full_indiv_data=indiv_data,recruitment=TRUE,
                                       mps=0.8,lvps=0.5)
     }
     if(ds>1){
-      new_info<-timestep_demographics(indiv_data=indiv_data,full_indiv_data=full_indiv_data,recruitment=FALSE,
+      new_info<-timestep_demographics(indiv_data=indiv_data,full_indiv_data=full_indiv_data,recruitment=TRUE,
                                       mps=0.8,lvps=0.5)
     }
 
@@ -262,7 +262,7 @@ for(i in 1:nrow(pars2)){
                                         p_og=0.2,wo_m=0.25,wo_v=0.025,
                                         d_effp=4,d_effw=4,
                                         covs=2,effs,
-                                        p_wr_i=p_wr_i,p_wr_e=0.5,
+                                        p_wr_i=0.1,p_wr_e=0.5,
                                         plot=FALSE)
 
     pop_mat<-net_info[[1]]
