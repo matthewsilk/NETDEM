@@ -1,6 +1,7 @@
 pars1<-readRDS("parameters1.RDS")
 
 #load R packages
+library(genNetDem)
 library(igraph)
 library(asnipe)
 library(sna)
