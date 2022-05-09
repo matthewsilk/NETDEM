@@ -1,27 +1,27 @@
 {
-    "id": "82B14D6D",
-    "path": "~/GitHub/NETDEM/genNetDem/R/covariates_survival.R",
-    "project_path": "R/covariates_survival.R",
+    "id": "4C228F9A",
+    "path": "~/GitHub/NETDEM/CaseStudy2/SimulationScript.R",
+    "project_path": "SimulationScript.R",
     "type": "r_source",
-    "hash": "503565181",
+    "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1651844759615.0,
+    "created": 1652097466031.0,
     "source_on_save": false,
-    "relative_order": 8,
+    "relative_order": 2,
     "properties": {
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "35,64",
-        "scrollLine": "2"
+        "cursorPosition": "105,2",
+        "scrollLine": "86"
     },
     "folds": "",
-    "lastKnownWriteTime": 1651844775,
+    "lastKnownWriteTime": 1652099010,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1651844775097,
+    "last_content_update": 1652099010871,
     "read_only": false,
     "read_only_alternatives": []
 }

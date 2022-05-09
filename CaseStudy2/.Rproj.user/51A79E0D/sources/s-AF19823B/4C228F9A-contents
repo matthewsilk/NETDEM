@@ -1,4 +1,4 @@
-pars1<-readRDS("parameters1.RDS")
+pars2<-readRDS("parameters2.RDS")
 
 #load R packages
 library(genNetDem)
@@ -61,66 +61,29 @@ nim_mod <- nimbleCode({
 ##############################
 ##############################
 
-nim_mod2 <- nimbleCode({
-  beta[1] ~ dnorm(mean=0,sd=10) #prior female
-  beta[2] ~ dnorm(mean=0,sd=10) #prior male
-  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
-  p ~ dunif(0, 1) # prior detection
+SAMP_RES<-array(NA,dim=c(4,7,nrow(pars2)))
 
-  #prior for missing betweenness values
-  for(i in 1:nrmc){
-    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,2]],sd=sd_t[miss_clo2[i,2]])
-  }
-
-  # likelihood
-  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
-  omega[1,2] <- p        # Pr(alive t -> detected t)
-  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
-  omega[2,2] <- 0        # Pr(dead t -> detected t)
-  for (i in 1:N){
-    for(j in 1:(T-1)){
-      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
-      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
-      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
-      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
-      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
-    }
-  }
-  delta[1] <- 1          # Pr(alive t = 1) = 1
-  delta[2] <- 0          # Pr(dead t = 1) = 0
-  for (i in 1:N){
-    z[i,1] ~ dcat(delta[1:2])
-    for (j in 2:T){
-      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
-      y[i,j] ~ dcat(omega[z[i,j], 1:2])
-    }
-  }
-})
+pcgs<-unique(pars2$pcg)
+seq_lengths<-unique(pars2$pcg)*10
 
 ##############################
 ##############################
 
-SAMP_RES_L<-FULL_RES_L<-SAMP_RES_C<-FULL_RES_C<-array(NA,dim=c(4,7,nrow(pars1)))
+for(i in 1:nrow(pars2)){
 
-##############################
-##############################
-
-for(i in 10:nrow(pars1)){
-
-  p_wr_i<-pars1[i,1]
-  pcg<-pars1[i,2]
-  p_wr_i<-pars1[i,1]
-  net_vars<-as.character(pars1[i,3])
+  ng<-pars2[i,1]
+  pcg<-pars2[i,2]
+  pmi<-pars2[i,3]
+  net_vars<-as.character(pars2[i,4])
   ifelse(net_vars=="strength",net_vars2<-"strength",net_vars2<-"betweenness")
   ifelse(net_vars=="strength",net_packages<-"igraph",net_packages<-"tnet")
-  net_effs<-pars1[i,4]
-  max_cor<-pars1[i,5]
-  reps<-pars1[i,6]
+  net_effs<-pars2[i,5]
+  reps<-pars2[i,6]
 
   ##Generate capture-recapture dataset
 
   #Generate population
-  pop_info<-population_generation_basic(n=200,ng=200)
+  pop_info<-population_generation_basic(n=200,ng=ng,plot=FALSE)
   indiv_data<-pop_info[[1]]
   dist_mat<-pop_info[[2]]
 
@@ -145,7 +108,7 @@ for(i in 10:nrow(pars1)){
 
   ##Step two: iterate over behavioural and demographic time steps
 
-  beh_steps<-5
+  beh_steps<-20
   dem_steps<-10
 
   CG<-list()
@@ -160,6 +123,10 @@ for(i in 10:nrow(pars1)){
 
   clo<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
   clo_tr<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
+
+  start_obs<-2
+  end_obs<-max(seq(start_obs,20,by=seq_lengths[pcgs==pcg]))
+  interval_obs<-seq_lengths[pcgs==pcg]
 
   for(ds in 1:dem_steps){
 
@@ -192,16 +159,16 @@ for(i in 10:nrow(pars1)){
     #Observe networks over these timesteps
     if(ds==1){
       obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                            pcg=pcg,pmi=0.9,pci=0.9,
-                            start_obs=1,end_obs=max(samp_wind),interval_obs=1,
-                            start_cap=1,end_cap=2,interval_cap=1,
+                            pcg=pcg,pmi=pmi,pci=0.9,
+                            start_obs=1,end_obs=end_obs,interval_obs=interval_obs,
+                            start_cap=1,end_cap=1,interval_cap=1,
                             pre_cap=seq(1,100,1))
     }
     if(ds>1){
       obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                            pcg=pcg,pmi=0.9,pci=0.9,
-                            start_obs=1,end_obs=max(samp_wind),interval_obs=1,
-                            start_cap=1,end_cap=2,interval_cap=1,
+                            pcg=pcg,pmi=pmi,pci=0.9,
+                            start_obs=1,end_obs=end_obs,interval_obs=interval_obs,
+                            start_cap=1,end_cap=1,interval_cap=1,
                             pre_cap=pre_cap_t2)
     }
 
@@ -262,7 +229,7 @@ for(i in 10:nrow(pars1)){
                                     group_means=NULL,
                                     ext_vars="sex",ext_effs=list(c(0,0.5)),scale_ext=FALSE,
                                     net_vars=net_vars,net_effs=list(net_effs),net_packages=net_packages,scale_net=TRUE,
-                                    net_cov=TRUE,max_cor=max_cor,
+                                    net_cov=FALSE,
                                     mps=0.8,lvps=0.5)
 
     par(mfrow=c(1,2))
@@ -331,9 +298,9 @@ for(i in 10:nrow(pars1)){
                                     clo2 = clo2b)
   parameters.to.save <- c("beta","p")
 
-  n.iter <- 5000
+  n.iter <- 11000
   n.burnin <- 1000
-  n.chains <- 2
+  n.chains <- 1
   thin<-5
 
   mcmc.output <- nimbleMCMC(code =nim_mod,
@@ -348,142 +315,7 @@ for(i in 10:nrow(pars1)){
 
   store_res<-MCMCsummary(mcmc.output, round = 2)
 
-  SAMP_RES_L[,,i]<-as.matrix(store_res)
-
-  ######
-
-  clo2<-apply(clo,2,scale)
-  clo2<-clo2[,1:(ncol(clo2)-1)]
-  clo2b<-clo2
-  clo2b[is.na(clo2b)]<-0
-  miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
-  miss_clo2<-which(miss_clo==1,arr.ind=T)
-
-  me_t<-apply(clo2,2,mean,na.rm=T)
-  sd_t<-apply(clo2,2,sd,na.rm=T)
-
-  my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
-                       miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
-                       nrmc=nrow(miss_clo2))
-  my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
-  zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
-  zinits[zinits == 2] <- 1 # dead -> alive
-  initial.values <- function() list(beta = rnorm(3,0,3),
-                                    p = runif(1,0,1),
-                                    z = zinits,
-                                    clo2 = clo2b)
-  parameters.to.save <- c("beta","p")
-
-  n.iter <- 5000
-  n.burnin <- 1000
-  n.chains <- 2
-  thin<-5
-
-  mcmc.output <- nimbleMCMC(code =nim_mod2,
-                            constants = my.constants,
-                            data = my.data,
-                            inits = initial.values,
-                            monitors = parameters.to.save,
-                            niter = n.iter,
-                            nburnin = n.burnin,
-                            nchains = n.chains,
-                            thin=thin)
-
-  store_res<-MCMCsummary(mcmc.output, round = 2)
-
-  SAMP_RES_C[,,i]<-as.matrix(store_res)
-
-  ######
-
-  clo2<-apply(clo_tr,2,scale)
-  clo2[which(is.na(clo),arr.ind=TRUE)]<-NA
-  clo2<-clo2[,1:(ncol(clo2)-1)]
-  clo2b<-clo2
-  clo2b[is.na(clo2b)]<-0
-  miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
-  miss_clo2<-which(miss_clo==1,arr.ind=T)
-
-  me_t<-apply(clo2,1,mean,na.rm=T)
-  me_t[is.na(me_t)]<-mean(me_t,na.rm=TRUE)
-  sd_t<-apply(clo2,1,sd,na.rm=T)
-  sd_t[is.na(sd_t)]<-mean(sd_t,na.rm=TRUE)
-
-  my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
-                       miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
-                       nrmc=nrow(miss_clo2))
-  my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
-  zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
-  zinits[zinits == 2] <- 1 # dead -> alive
-  initial.values <- function() list(beta = rnorm(3,0,3),
-                                    p = runif(1,0,1),
-                                    z = zinits,
-                                    clo2 = clo2b)
-
-  parameters.to.save <- c("beta","p")
-
-  n.iter <- 5000
-  n.burnin <- 1000
-  n.chains <- 2
-  thin<-5
-
-  mcmc.output2 <- nimbleMCMC(code = nim_mod,
-                             constants = my.constants,
-                             data = my.data,
-                             inits = initial.values,
-                             monitors = parameters.to.save,
-                             niter = n.iter,
-                             nburnin = n.burnin,
-                             nchains = n.chains,
-                             thin=thin)
-
-  store_res2<-MCMCsummary(mcmc.output2, round = 2)
-
-  FULL_RES_L[,,i]<-as.matrix(store_res2)
-
-  ######
-
-  clo2<-apply(clo_tr,2,scale)
-  clo2[which(is.na(clo),arr.ind=TRUE)]<-NA
-  clo2<-clo2[,1:(ncol(clo2)-1)]
-  clo2b<-clo2
-  clo2b[is.na(clo2b)]<-0
-  miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
-  miss_clo2<-which(miss_clo==1,arr.ind=T)
-
-  me_t<-apply(clo2,2,mean,na.rm=T)
-  sd_t<-apply(clo2,2,sd,na.rm=T)
-
-  my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
-                       miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
-                       nrmc=nrow(miss_clo2))
-  my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
-  zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
-  zinits[zinits == 2] <- 1 # dead -> alive
-  initial.values <- function() list(beta = rnorm(3,0,3),
-                                    p = runif(1,0,1),
-                                    z = zinits,
-                                    clo2 = clo2b)
-
-  parameters.to.save <- c("beta","p")
-
-  n.iter <- 5000
-  n.burnin <- 1000
-  n.chains <- 2
-  thin<-5
-
-  mcmc.output2 <- nimbleMCMC(code = nim_mod2,
-                             constants = my.constants,
-                             data = my.data,
-                             inits = initial.values,
-                             monitors = parameters.to.save,
-                             niter = n.iter,
-                             nburnin = n.burnin,
-                             nchains = n.chains,
-                             thin=thin)
-
-  store_res2<-MCMCsummary(mcmc.output2, round = 2)
-
-  FULL_RES_C[,,i]<-as.matrix(store_res2)
+  SAMP_RES[,,i]<-as.matrix(store_res)
 
   print(i)
 }

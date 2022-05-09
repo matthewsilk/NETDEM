@@ -84,7 +84,9 @@ network_generation_covariates<-function(indiv_data,dist_mat,indiv_info,
 
         t_e1<-stats::rbinom(1,1,probs[1])
         beta_mean<-probs[2]
+        print(beta_mean)
         beta_var<-probs[3]
+        print(beta_var)
         weights<-nleqslv::nleqslv(c(1,1), fn_sol)$x
         t_e2<-stats::rbeta(1,weights[1],weights[2])
         pop_mat[i,j]<-pop_mat[j,i]<-t_e1*t_e2
