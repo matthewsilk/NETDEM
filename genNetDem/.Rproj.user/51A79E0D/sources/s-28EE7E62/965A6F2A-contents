@@ -1,0 +1,32 @@
+---
+title: "Different types of network"
+author: "Matthew Silk"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Different types of network}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align="center",
+  fig.width=8,
+  fig.height=6)
+```
+
+### Here we provide an overview of how to use `netGenDem` to simulate different types of network. 
+
+***
+
+First we load the package
+
+```{r load_packages, message=FALSE,warning=FALSE}
+
+library(genNetDem)
+library(asnipe)
+
+```

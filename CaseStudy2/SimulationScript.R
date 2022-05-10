@@ -158,17 +158,17 @@ for(i in 1:nrow(pars2)){
 
     #Observe networks over these timesteps
     if(ds==1){
-      obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                            pcg=pcg,pmi=pmi,pci=0.9,
-                            start_obs=1,end_obs=end_obs,interval_obs=interval_obs,
-                            start_cap=1,end_cap=1,interval_cap=1,
-                            pre_cap=seq(1,100,1))
+      obs_info<-cap_and_obs2(samp_wind=samp_wind,gbi=gbi,
+                            pcg=0.9,pmg=pcg,pmi=pmi,pci=0.9,
+                            obs_seq=seq(start_obs,20,by=interval_obs),
+                            cap_seq=1,
+                            pre_cap=NULL)
     }
     if(ds>1){
-      obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
-                            pcg=pcg,pmi=pmi,pci=0.9,
-                            start_obs=1,end_obs=end_obs,interval_obs=interval_obs,
-                            start_cap=1,end_cap=1,interval_cap=1,
+      obs_info<-cap_and_obs2(samp_wind=samp_wind,gbi=gbi,
+                            pcg=0.9,pmg=pcg,pmi=pmi,pci=0.9,
+                            obs_seq=seq(start_obs,20,by=interval_obs),
+                            cap_seq=1,
                             pre_cap=pre_cap_t2)
     }
 

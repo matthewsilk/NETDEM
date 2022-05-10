@@ -1,0 +1,3 @@
+"2","Error in seq.default(max(indiv_data$indivs) + 1, max(indiv_data$indivs) +  : 
+  wrong sign in 'by' argument
+"

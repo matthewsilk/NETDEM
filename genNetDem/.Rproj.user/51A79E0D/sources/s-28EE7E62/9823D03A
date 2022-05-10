@@ -1,0 +1,28 @@
+{
+    "id": "9823D03A",
+    "path": "~/GitHub/NETDEM/genNetDem/vignettes/SimulatingSurvival.Rmd",
+    "project_path": "vignettes/SimulatingSurvival.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1652109568805.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled2",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "193,0",
+        "scrollLine": "184",
+        "last_setup_crc32": ""
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1652110367,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1652110367588,
+    "read_only": false,
+    "read_only_alternatives": []
+}

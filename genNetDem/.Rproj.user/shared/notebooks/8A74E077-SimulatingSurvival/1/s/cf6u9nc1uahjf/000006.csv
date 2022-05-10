@@ -1,2 +1,0 @@
-"0","plot(graph.adjacency(network,mode=""undirected"",weighted=TRUE),vertex.label=NA,vertex.size=20+4*scale(indiv_data$survival))"
-"0",""
