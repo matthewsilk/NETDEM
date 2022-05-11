@@ -149,7 +149,7 @@ Finally, it provides plots of the correlation between four key centrality measur
 ```{r timestep_example_behaviour2}
 
 #Check networks produced
-#network_checker_simul(gbi=gbi,pop_net=pop_net)
+network_checker_simul(gbi=gbi,pop_net=pop_net)
 
 ```
 
@@ -183,7 +183,7 @@ Finally, it provides plots of the correlation between four key centrality measur
 
 ```{r timestep_example_behaviour4}
 
-#obs_net_checker(observed_gbi,asnipe::get_network(gbi),pop_mat)
+obs_net_checker(observed_gbi,asnipe::get_network(gbi),pop_mat)
 
 ```
 

@@ -81,7 +81,7 @@ samp_wind<-int_info[[2]]
 ## ----timestep_example_behaviour2----------------------------------------------
 
 #Check networks produced
-#network_checker_simul(gbi=gbi,pop_net=pop_net)
+network_checker_simul(gbi=gbi,pop_net=pop_net)
 
 
 ## ----timestep_example_behaviour3----------------------------------------------
@@ -100,7 +100,7 @@ observed_groups<-obs_info[[4]]
 
 ## ----timestep_example_behaviour4----------------------------------------------
 
-#obs_net_checker(observed_gbi,asnipe::get_network(gbi),pop_mat)
+obs_net_checker(observed_gbi,asnipe::get_network(gbi),pop_mat)
 
 
 ## ----timestep_example_demography----------------------------------------------

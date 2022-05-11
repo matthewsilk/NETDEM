@@ -42,6 +42,7 @@ timestep_demographics<-function(indiv_data,full_indiv_data,recruitment=TRUE,
   n<-length(unique(indiv_data$indivs))
   ng<-length(unique(indiv_data$groups))
 
+  print("A")
   recruit_groups<-numeric()
   if(n==ng){
     tl<-length(groups_which_dead)
@@ -57,7 +58,6 @@ timestep_demographics<-function(indiv_data,full_indiv_data,recruitment=TRUE,
     if(length(recruit_groups)<n_recruits){
       l_tmp<-length(recruit_groups)
       l_rem<-n_recruits-length(recruit_groups)
-      print(l_rem)
       recruit_groups[(l_tmp+1):(l_tmp+l_rem)]<-seq(max(indiv_data$groups)+1,max(indiv_data$groups)+l_rem,1)
     }
   }
@@ -71,6 +71,7 @@ timestep_demographics<-function(indiv_data,full_indiv_data,recruitment=TRUE,
   new_y<-stats::runif(length(new_groups),0,1)
   new_gi<-data.frame(new_groups,new_x,new_y)
 
+  print("B")
   recruit_indivs<-seq(max(indiv_data$indivs)+1,max(indiv_data$indivs)+n_recruits,1)
 
   new_indiv_data<-data.frame(recruit_indivs,recruit_groups)

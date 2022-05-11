@@ -1,0 +1,48 @@
+"0","library(sna)
+"
+"2","Loading required package: statnet.common
+"
+"2","
+Attaching package: ‘statnet.common’
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    attr, order
+
+"
+"2","Loading required package: network
+"
+"2","
+‘network’ 1.17.1 (2021-06-12), part of the Statnet Project
+* ‘news(package=""network"")’ for changes since last version
+* ‘citation(""network"")’ for citation information
+* ‘https://statnet.org’ for help, support, and other information
+
+"
+"2","
+Attaching package: ‘network’
+
+"
+"2","The following objects are masked from ‘package:igraph’:
+
+    %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices, get.edge.attribute, get.edges, get.vertex.attribute,
+    is.bipartite, is.directed, list.edge.attributes, list.vertex.attributes, set.edge.attribute, set.vertex.attribute
+
+"
+"2","sna: Tools for Social Network Analysis
+Version 2.6 created on 2020-10-5.
+copyright (c) 2005, Carter T. Butts, University of California-Irvine
+ For citation information, type citation(""sna"").
+ Type help(package=""sna"") to get started.
+
+"
+"2","
+Attaching package: ‘sna’
+
+"
+"2","The following objects are masked from ‘package:igraph’:
+
+    betweenness, bonpow, closeness, components, degree, dyad.census, evcent, hierarchy, is.connected, neighborhood, triad.census
+
+"
