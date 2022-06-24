@@ -1,5 +1,22 @@
-"0","library(sna)
+"0",""
+"0","library(genNetDem)"
+"0","library(asnipe)"
+"0","library(igraph)"
+"2","
+Attaching package: ‘igraph’
+
 "
+"2","The following objects are masked from ‘package:stats’:
+
+    decompose, spectrum
+
+"
+"2","The following object is masked from ‘package:base’:
+
+    union
+
+"
+"0","library(sna)"
 "2","Loading required package: statnet.common
 "
 "2","
@@ -26,8 +43,9 @@ Attaching package: ‘network’
 "
 "2","The following objects are masked from ‘package:igraph’:
 
-    %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices, get.edge.attribute, get.edges, get.vertex.attribute,
-    is.bipartite, is.directed, list.edge.attributes, list.vertex.attributes, set.edge.attribute, set.vertex.attribute
+    %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices, get.edge.attribute, get.edges,
+    get.vertex.attribute, is.bipartite, is.directed, list.edge.attributes, list.vertex.attributes,
+    set.edge.attribute, set.vertex.attribute
 
 "
 "2","sna: Tools for Social Network Analysis
@@ -43,6 +61,10 @@ Attaching package: ‘sna’
 "
 "2","The following objects are masked from ‘package:igraph’:
 
-    betweenness, bonpow, closeness, components, degree, dyad.census, evcent, hierarchy, is.connected, neighborhood, triad.census
+    betweenness, bonpow, closeness, components, degree, dyad.census, evcent, hierarchy, is.connected,
+    neighborhood, triad.census
 
+"
+"0","library(viridis)"
+"2","Loading required package: viridisLite
 "
