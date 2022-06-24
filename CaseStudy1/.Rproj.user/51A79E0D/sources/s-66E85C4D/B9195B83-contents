@@ -1,0 +1,4 @@
+dat<-runif(1000,0,0.5)
+hist(dat)
+dat2<-boot::logit(dat)
+hist(dat2)
