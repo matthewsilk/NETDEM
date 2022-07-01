@@ -160,7 +160,8 @@ pre_cap<-NULL
 
 ts_surv<-numeric()
 
-cluclo<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
+clo<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
+clo_tr<-matrix(NA,nr=nrow(indiv_data),nc=dem_steps)
 
 for(ds in 1:dem_steps){
   
@@ -195,8 +196,8 @@ for(ds in 1:dem_steps){
     obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
                           pcg=0.5,pmi=0.9,pci=0.9,
                           start_obs=1,end_obs=max(samp_wind),interval_obs=1,
-                          start_cap=1,end_cap=2,interval_cap=1,
-                          pre_cap=NULL)
+                          start_cap=1,end_cap=1,interval_cap=1,
+                          pre_cap=seq(1,100,1))
   }
   if(ds>1){
     obs_info<-cap_and_obs(samp_wind=samp_wind,gbi=gbi,
@@ -228,27 +229,47 @@ for(ds in 1:dem_steps){
   
   network<-get_network2(gbi)
   
-  network_obs<-get_network2(observed_gbi)
+  observed_gbi2<-observed_gbi[,colSums(observed_gbi)>0]
+  network_obs<-get_network2(observed_gbi2)
   
-  clu_tmp<-clustering_local_w(as.tnet(network_obs))
-  clu_tmp<-clu_tmp[,ncol(clu_tmp)]
-  if(length(clu_tmp)<nrow(network)){
-    clu_tmp<-c(clu_tmp,rep(NaN,(nrow(network)-length(clu_tmp))))
+  network2<-graph.adjacency(network,mode="undirected",weighted=TRUE)
+  clo_tmp<-igraph::betweenness(network2,weights=1/E(network2)$weight,normalized=TRUE)
+  if(length(clo_tmp)<nrow(network)){
+    clo_tmp<-c(clo_tmp,rep(NaN,(nrow(network)-length(clo_tmp))))
   }
-  if(sum(is.na(clu_tmp)&colSums(observed_gbi)>0)>0){
-    clu_tmp[is.na(clu_tmp)&colSums(observed_gbi)>0]<-0
+  if(sum(is.na(clo_tmp)&colSums(gbi)>0)>0){
+    clo_tmp[is.na(clo_tmp)&colSums(gbi)>0]<-0
   }
   
-  cluclo[indiv_data$indivs,ds]<-clu_tmp
+  clo_tr[indiv_data$indivs,ds]<-clo_tmp
+  
+  network_obs2<-graph.adjacency(network_obs,mode="undirected",weighted=TRUE)
+  clo_tmp<-igraph::betweenness(network_obs2,weights=1/E(network_obs2)$weight,normalized=TRUE)
+  if(length(clo_tmp)<nrow(network_obs)){
+    clo_tmp<-c(clo_tmp,rep(NaN,(nrow(network_obs)-length(clo_tmp))))
+  }
+  if(sum(is.na(clo_tmp)&colSums(observed_gbi2)>0)>0){
+    clo_tmp[is.na(clo_tmp)&colSums(observed_gbi)>0]<-0
+  }
+  
+  clo[indiv_data$indivs[colSums(observed_gbi)>0],ds]<-clo_tmp
+  
+  par(mfrow=c(1,2))
+  plot(network2,vertex.label=NA,edge.width=(E(pop_net)$weight*10)^1.5,vertex.size=8)
+  plot(network_obs2,vertex.label=NA,edge.width=(E(pop_net)$weight*10)^1.5,vertex.size=8)
+  par(mfrow=c(1,1))
   
   indiv_data<-covariates_survival(indiv_data=indiv_data,indiv_info=indiv_info,network=network,
                                   group_means=NULL,
                                   ext_vars="sex",ext_effs=list(c(0,-1)),scale_ext=FALSE,
-                                  net_vars="clustering_local_w",net_effs=list(0.25),net_packages="tnet",scale_net=TRUE,
+                                  net_vars="betweenness",net_effs=list(-0.25),net_packages="igraph",scale_net=TRUE,
                                   net_cov=TRUE,max_cor=-0.9,
                                   mps=0.8,lvps=0.5)
   
+  par(mfrow=c(1,2))
   boxplot(indiv_data$survival~indiv_info[[1]]$sex)
+  plot(indiv_data$survival~clo_tr[indiv_data$indivs,ds])
+  par(mfrow=c(1,1))
   
   ts_surv[ds]<-mean(indiv_data$survival,na.rm=TRUE)
   
@@ -276,7 +297,7 @@ for(ds in 1:dem_steps){
                                       d_effp=4,d_effw=4,
                                       covs=2,effs,
                                       p_wr_i=0,p_wr_e=0.5,
-                                      plot=TRUE)
+                                      plot=FALSE)
   
   pop_mat<-net_info[[1]]
   pop_net<-net_info[[2]]
@@ -449,22 +470,38 @@ MCMCsummary(mcmc.output, round = 2)
 ###########################################
 ###########################################
 
+
+clo2<-apply(clo,2,scale)
+clo2<-clo2[,1:(ncol(clo2)-1)]
+clo2b<-clo2
+clo2b[is.na(clo2b)]<-0
+miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
+miss_clo2<-which(miss_clo==1,arr.ind=T)
+
+me_t<-apply(clo2,2,mean,na.rm=T)
+sd_t<-apply(clo2,2,sd,na.rm=T)
+
 hmm.survival3 <- nimbleCode({
   beta[1] ~ dnorm(mean=0,sd=10) #prior female
   beta[2] ~ dnorm(mean=0,sd=10) #prior male
-  beta[3] ~ dnorm(mean=0,sd=10)
+  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
   p ~ dunif(0, 1) # prior detection
-  # likelihood
   
+  #prior for missing betweenness values
+  for(i in 1:nrmc){
+    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,2]],sd=sd_t[miss_clo2[i,2]])
+  }
+  
+  # likelihood
   omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
   omega[1,2] <- p        # Pr(alive t -> detected t)
   omega[2,1] <- 1        # Pr(dead t -> non-detected t)
   omega[2,2] <- 0        # Pr(dead t -> detected t)
   for (i in 1:N){
     for(j in 1:(T-1)){
-      logit(phi[i]) <- beta[sex[i]]+beta[3]*cluclo[i,j]
-      gamma[1,1,i,j] <- phi[i]      # Pr(alive t -> alive t+1)
-      gamma[1,2,i,j] <- 1 - phi[i]  # Pr(alive t -> dead t+1)
+      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
+      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
       gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
       gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
     }
@@ -480,17 +517,20 @@ hmm.survival3 <- nimbleCode({
   }
 })
 
-my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex))
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
+                     miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
+                     nrmc=nrow(miss_clo2))
 my.constants
-my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),cluclo=cluclo)
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
 my.data
 zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
 zinits[zinits == 2] <- 1 # dead -> alive
 initial.values <- function() list(beta = rnorm(3,0,3),
                                   p = runif(1,0,1),
-                                  z = zinits)
+                                  z = zinits,
+                                  clo2 = clo2b)
 
-parameters.to.save <- c("beta","p")
+parameters.to.save <- c("beta","p","clo2")
 parameters.to.save
 
 n.iter <- 25000
@@ -499,7 +539,360 @@ n.chains <- 4
 thin<-5
 
 start_time <- Sys.time()
-mcmc.output <- nimbleMCMC(code = hmm.survival2,
+mcmc.output <- nimbleMCMC(code = hmm.survival3,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
+
+###############################
+###############################
+
+me_t<-apply(clo2,1,mean,na.rm=T)
+me_t[is.na(me_t)]<-mean(me_t,na.rm=TRUE)
+sd_t<-apply(clo2,1,sd,na.rm=T)
+sd_t[is.na(sd_t)]<-mean(sd_t,na.rm=TRUE)
+
+hmm.survival4 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
+  p ~ dunif(0, 1) # prior detection
+  
+  #prior for missing betweenness values
+  for(i in 1:nrmc){
+    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,1]],sd=sd_t[miss_clo2[i,1]])
+  }
+  
+  # likelihood
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    for(j in 1:(T-1)){
+      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
+      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
+      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
+      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
+    }
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
+                     miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
+                     nrmc=nrow(miss_clo2))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(3,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits,
+                                  clo2 = clo2b)
+
+parameters.to.save <- c("beta","p","clo2")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival4,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
+
+
+#############################
+
+##Here I am going to recheck model above with true network covariate values to
+##check whether failure to infer network effect is related to network sampling
+##or imputation
+
+cor.test(clo_tr,clo)
+
+clo2<-apply(clo_tr,2,scale)
+clo2<-clo2[,1:(ncol(clo2)-1)]
+clo2b<-clo2
+clo2b[is.na(clo2b)]<-0
+miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
+miss_clo2<-which(miss_clo==1,arr.ind=T)
+
+
+me_t<-apply(clo2,1,mean,na.rm=T)
+me_t[is.na(me_t)]<-mean(me_t,na.rm=TRUE)
+sd_t<-apply(clo2,1,sd,na.rm=T)
+sd_t[is.na(sd_t)]<-mean(sd_t,na.rm=TRUE)
+
+hmm.survival5 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
+  p ~ dunif(0, 1) # prior detection
+  
+  #prior for missing betweenness values
+  for(i in 1:nrmc){
+    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,1]],sd=sd_t[miss_clo2[i,1]])
+  }
+  
+  # likelihood
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    for(j in 1:(T-1)){
+      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
+      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
+      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
+      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
+    }
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
+                     miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
+                     nrmc=nrow(miss_clo2))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(3,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits,
+                                  clo2 = clo2b)
+
+parameters.to.save <- c("beta","p","clo2")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival5,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
+
+#####################
+
+##And now sampled to keep true values but only for individuals when they've
+##been observed alive
+
+cor.test(clo_tr,clo)
+
+clo2<-apply(clo_tr,2,scale)
+clo2[which(is.na(clo),arr.ind=TRUE)]<-NA
+clo2<-clo2[,1:(ncol(clo2)-1)]
+clo2b<-clo2
+clo2b[is.na(clo2b)]<-0
+miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
+miss_clo2<-which(miss_clo==1,arr.ind=T)
+
+me_t<-apply(clo2,1,mean,na.rm=T)
+me_t[is.na(me_t)]<-mean(me_t,na.rm=TRUE)
+sd_t<-apply(clo2,1,sd,na.rm=T)
+sd_t[is.na(sd_t)]<-mean(sd_t,na.rm=TRUE)
+
+hmm.survival6 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
+  p ~ dunif(0, 1) # prior detection
+  
+  #prior for missing betweenness values
+  for(i in 1:nrmc){
+    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,1]],sd=sd_t[miss_clo2[i,1]])
+  }
+  
+  # likelihood
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    for(j in 1:(T-1)){
+      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
+      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
+      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
+      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
+    }
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
+                     miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
+                     nrmc=nrow(miss_clo2))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(3,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits,
+                                  clo2 = clo2b)
+
+parameters.to.save <- c("beta","p","clo2")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival6,
+                          constants = my.constants,
+                          data = my.data,
+                          inits = initial.values,
+                          monitors = parameters.to.save,
+                          niter = n.iter,
+                          nburnin = n.burnin,
+                          nchains = n.chains,
+                          thin=thin)
+end_time <- Sys.time()
+end_time - start_time
+
+MCMCsummary(mcmc.output, round = 2)
+
+#############
+
+##Same as above but with cross-sectional missing value imputation
+
+clo2<-apply(clo_tr,2,scale)
+clo2[which(is.na(clo),arr.ind=TRUE)]<-NA
+clo2<-clo2[,1:(ncol(clo2)-1)]
+clo2b<-clo2
+clo2b[is.na(clo2b)]<-0
+miss_clo<-apply(as.matrix(is.na(clo2)),2,as.numeric)
+miss_clo2<-which(miss_clo==1,arr.ind=T)
+
+me_t<-apply(clo2,2,mean,na.rm=T)
+sd_t<-apply(clo2,2,sd,na.rm=T)
+
+hmm.survival7 <- nimbleCode({
+  beta[1] ~ dnorm(mean=0,sd=10) #prior female
+  beta[2] ~ dnorm(mean=0,sd=10) #prior male
+  beta[3] ~ dnorm(mean=0,sd=10) #prior betweenness effect
+  p ~ dunif(0, 1) # prior detection
+  
+  #prior for missing betweenness values
+  for(i in 1:nrmc){
+    clo2[miss_clo2[i,1],miss_clo2[i,2]] ~ dnorm(mean=me_t[miss_clo2[i,2]],sd=sd_t[miss_clo2[i,2]])
+  }
+  
+  # likelihood
+  omega[1,1] <- 1 - p    # Pr(alive t -> non-detected t)
+  omega[1,2] <- p        # Pr(alive t -> detected t)
+  omega[2,1] <- 1        # Pr(dead t -> non-detected t)
+  omega[2,2] <- 0        # Pr(dead t -> detected t)
+  for (i in 1:N){
+    for(j in 1:(T-1)){
+      logit(phi[i,j]) <- beta[sex[i]]+beta[3]*clo2[i,j]
+      gamma[1,1,i,j] <- phi[i,j]      # Pr(alive t -> alive t+1)
+      gamma[1,2,i,j] <- 1 - phi[i,j]  # Pr(alive t -> dead t+1)
+      gamma[2,1,i,j] <- 0           # Pr(dead t -> alive t+1)
+      gamma[2,2,i,j] <- 1           # Pr(dead t -> dead t+1)
+    }
+  }
+  delta[1] <- 1          # Pr(alive t = 1) = 1
+  delta[2] <- 0          # Pr(dead t = 1) = 0
+  for (i in 1:N){
+    z[i,1] ~ dcat(delta[1:2])
+    for (j in 2:T){
+      z[i,j] ~ dcat(gamma[z[i,j-1], 1:2, i,j-1])
+      y[i,j] ~ dcat(omega[z[i,j], 1:2])
+    }
+  }
+})
+
+my.constants <- list(N = nrow(y), T = ncol(y)-1, sex=as.numeric(start_info[[1]]$sex),
+                     miss_clo2=miss_clo2,me_t=me_t,sd_t=sd_t,
+                     nrmc=nrow(miss_clo2))
+my.constants
+my.data <- list(y = as.matrix(y[,2:ncol(y)]+1),clo2=clo2)
+my.data
+zinits <- as.matrix(y[,2:ncol(y)] + 1) # non-detection -> alive
+zinits[zinits == 2] <- 1 # dead -> alive
+initial.values <- function() list(beta = rnorm(3,0,3),
+                                  p = runif(1,0,1),
+                                  z = zinits,
+                                  clo2 = clo2b)
+
+parameters.to.save <- c("beta","p","clo2")
+parameters.to.save
+
+n.iter <- 25000
+n.burnin <- 5000
+n.chains <- 4
+thin<-5
+
+start_time <- Sys.time()
+mcmc.output <- nimbleMCMC(code = hmm.survival7,
                           constants = my.constants,
                           data = my.data,
                           inits = initial.values,

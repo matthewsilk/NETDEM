@@ -1,0 +1,10 @@
+x1<-try(ergm(g~nonzero+sum+edgecov(Geodist,'Geodist'),response='weight',reference = ~Poisson,control=control.ergm(MCMLE.Hummel.maxit=1000,MPLE.type="penalized")))
+formula(x1)
+formula("x1")
+b<-1
+formula(paste0("x",b))
+eval(parse(text=paste("formula(x",b,")",sep='')))
+
+
+A<-NULL
+is.null(A)

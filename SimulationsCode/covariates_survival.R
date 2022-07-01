@@ -21,7 +21,7 @@ covariates_survival<-function(indiv_data,indiv_info,network,
     covMat <- stddev %*% t(stddev) * corMat
     covMat2<-as.matrix(Matrix::nearPD(covMat)$mat)
     if(covMat_check==TRUE){
-      print(summary(netlm(y=covMat2,x=covMat)))
+      print(summary(sna::netlm(y=covMat2,x=covMat)))
     }
     t_survival <- mvrnorm(n = 1, mu = rep(lmps,nrow(indiv_data)), Sigma = covMat2, empirical = FALSE)
   }
@@ -65,7 +65,14 @@ covariates_survival<-function(indiv_data,indiv_info,network,
       }
       if(is.na(net_packages[i])==FALSE&net_packages[i]=="igraph"){
         network2<-graph.adjacency(network,mode="undirected",weighted=TRUE)
-        met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network2)")))
+        if(net_vars[i]%in%c("closeness","betweenness")){
+          met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network2,weights=1/E(network2)$weight)")))
+        } else{
+          met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network2)")))
+        }
+        if(net_vars[i]=="eigen_centrality"){
+          met<-met$vector
+        }
       }
       if(is.na(net_packages[i])==FALSE&net_packages[i]=="sna"){
         met<-eval(parse(text=paste0(net_packages[i],"::",net_vars[i],"(network)")))
