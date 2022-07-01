@@ -1,8 +1,7 @@
-
-# pcg = probability of capturing a gathering
-# pmi = probability of marking/tagging an individual in a gathering on first capture
-# pci = probability of capturing/observing an individual within a gathering
-
+#'cap_and_obs
+#'
+#'Generates observations that can be used to generate CMR data and observed social networks.
+#'
 
 cap_and_obs<-function(samp_wind,gbi=gbi,
                       pcg=0.5,pmi=0.9,pci=0.9,
@@ -153,3 +152,9 @@ obs_net_checker<-function(gbi_o,full_mat,pop_mat){
   plot(igraph::closeness(obs_net,weights=1/E(obs_net)$weight)~igraph::closeness(full_net,weights=1/E(full_net)$weight))
   
 }
+
+# pcg = probability of capturing a gathering
+# pmi = probability of marking/tagging an individual in a gathering on first capture
+# pci = probability of capturing/observing an individual within a gathering
+
+

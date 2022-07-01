@@ -1,0 +1,111 @@
+--- re-building 'DifferentNetworks.Rmd' using rmarkdown
+Warning: package 'asnipe' was built under R version 4.1.3
+Warning: package 'igraph' was built under R version 4.1.3
+
+Attaching package: 'igraph'
+
+The following objects are masked from 'package:stats':
+
+    decompose, spectrum
+
+The following object is masked from 'package:base':
+
+    union
+
+Warning: package 'sna' was built under R version 4.1.3
+Loading required package: statnet.common
+Warning: package 'statnet.common' was built under R version 4.1.3
+
+Attaching package: 'statnet.common'
+
+The following objects are masked from 'package:base':
+
+    attr, order
+
+Loading required package: network
+Warning: package 'network' was built under R version 4.1.3
+
+'network' 1.17.1 (2021-06-12), part of the Statnet Project
+* 'news(package="network")' for changes since last version
+* 'citation("network")' for citation information
+* 'https://statnet.org' for help, support, and other information
+
+
+Attaching package: 'network'
+
+The following objects are masked from 'package:igraph':
+
+    %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices,
+    get.edge.attribute, get.edges, get.vertex.attribute, is.bipartite,
+    is.directed, list.edge.attributes, list.vertex.attributes,
+    set.edge.attribute, set.vertex.attribute
+
+sna: Tools for Social Network Analysis
+Version 2.6 created on 2020-10-5.
+copyright (c) 2005, Carter T. Butts, University of California-Irvine
+ For citation information, type citation("sna").
+ Type help(package="sna") to get started.
+
+
+Attaching package: 'sna'
+
+The following objects are masked from 'package:igraph':
+
+    betweenness, bonpow, closeness, components, degree, dyad.census,
+    evcent, hierarchy, is.connected, neighborhood, triad.census
+
+Quitting from lines 28-35 (DifferentNetworks.Rmd) 
+Error: processing vignette 'DifferentNetworks.Rmd' failed with diagnostics:
+there is no package called 'viridis'
+--- failed re-building 'DifferentNetworks.Rmd'
+
+--- re-building 'SimulatingSurvival.Rmd' using rmarkdown
+Warning: package 'asnipe' was built under R version 4.1.3
+Warning: package 'tnet' was built under R version 4.1.3
+Loading required package: igraph
+Warning: package 'igraph' was built under R version 4.1.3
+
+Attaching package: 'igraph'
+
+The following objects are masked from 'package:stats':
+
+    decompose, spectrum
+
+The following object is masked from 'package:base':
+
+    union
+
+Loading required package: survival
+tnet: Analysis of Weighted, Two-mode, and Longitudinal networks.
+Type ?tnet for help.
+Warning in tnet::as.tnet(network) :
+  Data assumed to be weighted one-mode tnet (if this is not correct, specify type)
+Warning in as.tnet(network) :
+  Data assumed to be weighted one-mode tnet (if this is not correct, specify type)
+Warning in as.tnet(network) :
+  Data assumed to be weighted one-mode tnet (if this is not correct, specify type)
+--- finished re-building 'SimulatingSurvival.Rmd'
+
+--- re-building 'usinggenNetDem.Rmd' using rmarkdown
+Warning: package 'asnipe' was built under R version 4.1.3
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y', 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y', 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y', 'cap.x', 'cap.y', 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y', 'cap.x', 'cap.y', 'cap.x', 'cap.y' are duplicated in the result
+Warning in merge.data.frame(pre_cap, pre_cap_t, by = "ID", all.x = TRUE,  :
+  column names 'cap.x', 'cap.y', 'cap.x', 'cap.y', 'cap.x', 'cap.y', 'cap.x', 'cap.y' are duplicated in the result
+--- finished re-building 'usinggenNetDem.Rmd'
+
+SUMMARY: processing the following file failed:
+  'DifferentNetworks.Rmd'
+
+Error: Vignette re-building failed.
+Execution halted

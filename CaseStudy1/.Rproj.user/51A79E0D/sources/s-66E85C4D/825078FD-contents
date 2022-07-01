@@ -1,0 +1,10 @@
+res<-list()
+for(i in 1:3240){
+  res[[i]]<-try(eval(parse(text=paste0("readRDS('results/res",i,".RDS')"))))
+}
+
+miss<-which(unlist(lapply(res,class))=="try-error")
+
+par1<-readRDS("parameters1.RDS")
+
+par1[281,]

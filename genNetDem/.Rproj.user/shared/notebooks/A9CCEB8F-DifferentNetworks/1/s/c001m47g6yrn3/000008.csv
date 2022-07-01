@@ -1,0 +1,6 @@
+"0",""
+"0","#Generate population"
+"0","pop_info<-population_generation_basic(n=100,ng=100,plot=FALSE)"
+"0","indiv_data<-pop_info[[1]]"
+"0","dist_mat<-pop_info[[2]]"
+"0",""

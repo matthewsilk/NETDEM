@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 C:/Users/matth/Downloads/ERGMshark-main/ERGMshark-main/FINAL_ERGMcount_code.R="B541C661"
 C:/Users/matth/Downloads/ERGMshark-main/ERGMshark-main/loop_update_suggestions.R="980CDEF7"
 C:/Users/matth/Downloads/ERGMshark-main/ERGMshark-main/new_network_creation.R="78EABCC3"
@@ -34,3 +35,18 @@ C:/Users/matth/Dropbox/MSCA_Fellowship/GitHub/SimulationsCode/population_generat
 C:/Users/matth/Dropbox/MSCA_Fellowship/GitHub/SimulationsCode/timestep_demographics.R="9C420D26"
 C:/Users/matth/Dropbox/RozinsCollab_Scripts_May19/12_RedefineNewYear_Post.r="8153216A"
 C:/Users/matth/Dropbox/RozinsCollab_Scripts_May19/1a_Rewire2.R="081E6A7A"
+=======
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/basic_survival.R="B7FA71A8"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/cap_and_obs.R="7D86F7E6"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/cap_dat_gen.R="E6007E48"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/covariates_survival.R="4461DCFB"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/example_script1.R="EB25C25A"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/interaction_generation_seq.R="5501233B"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/interaction_generation_simul.R="01463FF7"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/nimble_practice1.R="A59686A5"
+C:/Users/silk/Documents/GitHub/NETDEM/SimulationsCode/population_generation_basic.R="2F4B374C"
+C:/Users/silk/Documents/GitHub/NETDEM/genNetDem/R/interaction_generation_seq.R="B0F2C34A"
+C:/Users/silk/Documents/GitHub/NETDEM/genNetDem/R/interaction_generation_simul.R="82F033E7"
+C:/Users/silk/Documents/GitHub/NETDEM/genNetDem/R/network_checker_seq.R="1A8BDD27"
+C:/Users/silk/Documents/GitHub/NETDEM/genNetDem/R/population_generation_basic.R="AE9C280A"
+>>>>>>> f65f9fe154ef758f5c63ae053fc94f3d34d7ca79

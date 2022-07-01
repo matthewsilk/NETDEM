@@ -1,5 +1,27 @@
-##to do - community effect on survival?
-  #         network covariance effect on survival
+#'covariates_survival
+#'
+#'Generates survival probabilities for all individuals in the population based on their individual traits and position in the population social network.
+#'
+#'@param indiv_data current indiv_data dataframe
+#'@param indiv_info current indiv_info
+#'@param network adjacency matrix for the network used to calculate survival probabilities
+#'@param group_means social group (as defined in population generation) effects on survival probabilies. Provided on logit scale.
+#'@param ext_vars vector extrinsic variables (non-network) used to calculate survival probability. Names of columns in indiv_info dataframe. Defaults to NULL.
+#'@param ext_effs a list of effect sizes for each extrinsic variable provided. Single value for covariates. Value for each level for factors. Defaults to NULL
+#'@param scale_ext whether to scale extrinsic variables. Defaults to TRUE.
+#'@param net_vars vector of network measures that affect survival. Should be named as per the name of the function used in R (for a given package provided in net_packages=). Defaults to NULL
+#'@param net_effs list of effect sizes used to calculate effect of network measures on survival
+#'@param net_packages a vector of R packages of the same length of the net_vars providing the R package used to calculate each network measure. See examples
+#'@param scale_net whether to scale network measures. Defaults to TRUE.
+#'@param net_cov whether there should be network covariance in survival probability. Defaults to FALSE.
+#'@param max_cor maximum correlation (positive or negative) for network covariance in survival probabilities
+#'@param covMat_check whether to calculate a network regression to demonstrate that the adjusted covariance matrix (adjusted to be positive definite) is strongly correlated with the input matrix. Defaults to FALSE.
+#'@param mps overall mean population survival probability
+#'@param lvps variance in survival probability on logit scale
+#'@details This function simulates survival probabilities for all individuals in the population based on the covariates provided. Note that there is a huge amount of flexibility in this function, especially the network measures part of it but that its impossible to anticipate all possible demands with some packages/functions requiring varied inputs. The main ones are already covered but any issues with this can be reported as bugs and the package can be updated. Note also that the covariance matrix must be positive definite. We use the R function nearPD from the Matrix package to find the closest matrix to the provided network that is positive definite. This approximation normally works well but there is capability included to check how well correlated it is with the input network.
+
+#'@return The new indiv_data dataframe with newly calculated survival probabilities added
+#'@export
 
 covariates_survival<-function(indiv_data,indiv_info,network,
                               group_means=NULL,
@@ -110,3 +132,5 @@ covariates_survival<-function(indiv_data,indiv_info,network,
   return(indiv_data)
   
 }
+
+##to do - community effect on survival?

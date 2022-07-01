@@ -1,0 +1,2 @@
+A<-unlist(lapply(ts_surv2,colMeans))
+A[seq(2,20,2)]

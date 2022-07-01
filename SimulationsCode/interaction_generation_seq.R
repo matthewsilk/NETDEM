@@ -23,8 +23,7 @@ interaction_generation_seq<-function(pop_mat,indiv_data,
       t_mat<-pop_mat[t_g,can_join]
       if(is.vector(t_mat)){
         join_probs<-t_mat+float
-      }
-      else{
+      } else{
         join_probs<-apply(t_mat,2,jpc,par=par,float=float)
       }
       if(length(can_join)>1){

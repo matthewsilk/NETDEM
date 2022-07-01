@@ -9,30 +9,33 @@
 # (bounded by 0 and 1 on x and y axes)
 
 population_generation_basic<-function(n,ng){
-  #Number of individuals in the population
-  n<-100
   
   #Individual codes
   indivs<-seq(1,n,1)
-  
-  #Number of groups
-  ng<-100
   
   #Sort individuals into groups
   groups<-vector()
   if(n==ng){
     groups<-indivs
   }
-  if(n>ng){
+  if(n<ng){
     print("invalid number of groups")
   }
-  if(n<ng){
+  if(n>ng){
     groups<-sample(seq(1,ng,1),n,replace=TRUE)
   }
   
   #Locations
-  x<-runif(ng,0,1)
-  y<-runif(ng,0,1)
+  x1<-stats::runif(ng,0,1)
+  y1<-stats::runif(ng,0,1)
+  
+  x<-numeric()
+  y<-numeric()
+  
+  for(i in 1:n){
+    x[i]<-x1[groups[i]]
+    y[i]<-y1[groups[i]]
+  }
   
   #Check locations
   plot(x,y)

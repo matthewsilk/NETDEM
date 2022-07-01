@@ -1,0 +1,11 @@
+res<-list()
+for(i in 1440:1824){
+  res[[i]]<-try(eval(parse(text=paste0("readRDS('results/res",i,".RDS')"))))
+}
+
+miss<-which(unlist(lapply(res,class))=="try-error")
+
+(324,328,330,338,339,342,347,348,349,350,351,353,354,356,360,3681770 1786 1789 1791 1793 1795 1798 1800 1801 1802 1803 1807 1810)
+
+#370
+#1824
