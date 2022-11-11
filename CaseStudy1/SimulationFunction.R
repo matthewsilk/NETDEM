@@ -64,7 +64,7 @@ for(ds in 1:dem_steps){
   #Sample over some behaviour only time steps
   int_info<-interaction_generation_simul(indiv_data=indiv_data,pop_mat=pop_mat,
                                          mean_group_size=2,n_ts=beh_steps,
-                                         float=0.000000001,par=50,pow=4)
+                                         float=0.000000001,pm=50,pow=4)
   gbi<-int_info[[1]]
   samp_wind<-int_info[[2]]
 

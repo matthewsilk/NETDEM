@@ -1,0 +1,96 @@
+
+##Figure 3
+cols<-c("gray25","firebrick")
+cols2<-rep(rep(cols,each=2),4)
+
+effs<-unique(test_data2A$net_effs)
+effs2<-effs[-2]
+
+test_data2AA<-test_data2A[test_data2A$net_effs%in%effs2&test_data2A$m_inf=="M2",]
+
+par(mfrow=c(1,1),mar=c(5,6,2,6))
+boxplot(NULL,ylim=c(-0.2,1),xlim=c(0,5),las=1,xaxt="n",ylab="",xlab="",cex.axis=1.5,range=0,lty=1)
+lines(x=c(-100,100),y=c(0,0))
+lines(x=c(-100,100),y=c(0.8,0.8),lty=3,col="firebrick",lwd=3)
+mtext("Estimate for social effect",side=2,line=3.5,cex=1.25)
+
+par(mfrow=c(1,1),mar=c(5,6,2,6))
+boxplot(Beta3~net_effs,data=test_data2AA[test_data2AA$pcg==0.75&test_data2AA$net_effs==0.8&test_data2AA$net_vars=="strength",],at=3,las=1,xaxt="n",ylab="",xlab="",cex.axis=1.5,range=0,lty=1,col="firebrick",ylim=c(-0.2,1),xlim=c(0,5),boxwex=1.5)
+lines(x=c(-100,100),y=c(0,0))
+lines(x=c(-100,100),y=c(0.8,0.8),lty=3,col="firebrick",lwd=3)
+mtext("Estimate for social effect",side=2,line=3.5,cex=1.25)
+for(i in 3){
+  if(i%%2>0){
+    mtext("Strength",at=i,side=1,line=0.75,cex=1.5)
+  }
+  if(i%%2==0){
+    mtext("B",at=i,side=1,line=0.75,cex=1.5)
+  }
+}
+co<-2
+for(i in 3.5){
+  mtext(effs2[co],at=i,side=1,line=2.5,cex=1.75,col="firebrick")
+  co<-co+1
+  if(co>3){co<-1}
+}
+
+par(mfrow=c(1,1),mar=c(5,6,2,6))
+boxplot(Beta3~net_effs*net_vars,data=test_data2AA[test_data2AA$pcg==0.75&test_data2AA$net_effs==0.8,],at=c(3,4),las=1,xaxt="n",ylab="",xlab="",cex.axis=1.5,range=0,lty=1,col="firebrick",ylim=c(-0.2,1),xlim=c(0,5),boxwex=0.75)
+lines(x=c(-100,100),y=c(0,0))
+lines(x=c(-100,100),y=c(0.8,0.8),lty=3,col="firebrick",lwd=3)
+mtext("Estimate for social effect",side=2,line=3.5,cex=1.25)
+for(i in 3:4){
+  if(i%%2>0){
+    mtext("S",at=i,side=1,line=0.75,cex=1.5)
+  }
+  if(i%%2==0){
+    mtext("B",at=i,side=1,line=0.75,cex=1.5)
+  }
+}
+co<-2
+for(i in 3.5){
+  mtext(effs2[co],at=i,side=1,line=2.5,cex=1.75,col="firebrick")
+  co<-co+1
+  if(co>3){co<-1}
+}
+
+par(mfrow=c(1,1),mar=c(5,6,2,6))
+boxplot(Beta3~net_vars*net_effs,data=test_data2AA[test_data2AA$pcg==0.75,],las=1,xaxt="n",ylab="",xlab="",cex.axis=1.5,range=0,lty=1,col=cols2,ylim=c(-0.2,1),xlim=c(0,5),boxwex=0.75)
+lines(x=c(-100,100),y=c(0,0))
+lines(x=c(-100,100),y=c(0.8,0.8),lty=3,col="firebrick",lwd=3)
+mtext("Estimate for social effect",side=2,line=3.5,cex=1.25)
+for(i in 1:4){
+  if(i%%2>0){
+    mtext("S",at=i,side=1,line=0.75,cex=1.5)
+  }
+  if(i%%2==0){
+    mtext("B",at=i,side=1,line=0.75,cex=1.5)
+  }
+}
+co<-1
+for(i in seq(1.5,3.5,2)){
+  mtext(effs2[co],at=i,side=1,line=2.5,cex=1.75,col=cols[co])
+  co<-co+1
+  if(co>3){co<-1}
+}
+
+
+par(mfrow=c(1,1),mar=c(5,6,2,6))
+boxplot(Beta3~net_vars*net_effs,data=test_data2AA[test_data2AA$pcg==0.25,],las=1,xaxt="n",ylab="",xlab="",cex.axis=1.5,range=0,lty=1,col=cols2,ylim=c(-0.2,1),xlim=c(0,5),boxwex=0.75)
+lines(x=c(-100,100),y=c(0,0))
+lines(x=c(-100,100),y=c(0.8,0.8),lty=3,col="firebrick",lwd=3)
+mtext("Estimate for social effect",side=2,line=3.5,cex=1.25)
+for(i in 1:4){
+  if(i%%2>0){
+    mtext("S",at=i,side=1,line=0.75,cex=1.5)
+  }
+  if(i%%2==0){
+    mtext("B",at=i,side=1,line=0.75,cex=1.5)
+  }
+}
+co<-1
+for(i in seq(1.5,3.5,2)){
+  mtext(effs2[co],at=i,side=1,line=2.5,cex=1.75,col=cols[co])
+  co<-co+1
+  if(co>3){co<-1}
+}
