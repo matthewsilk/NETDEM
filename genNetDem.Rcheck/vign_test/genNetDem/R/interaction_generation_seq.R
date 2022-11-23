@@ -7,7 +7,7 @@
 #'@param ne number of groups
 #'@param mgs mean group size
 #'@param style_gs group size distribution. Currently either identical (style_gs=”rep”) or Poisson (style_gs=”pois”).
-#'@param par used in jpc to adjust social network connection strengths to probabilities of being sampled in the same group. Defaults to 20
+#'@param pm used in jpc to adjust social network connection strengths to probabilities of being sampled in the same group. Defaults to 20
 #'@param float used in jpc to provide a minimum probability of being sampled in the same group to allow all groups to be filled. Defaults to 0.0001
 #'
 #'@details Generates a sequential series of groups (c.f. interaction_generation_simul), whereby each group occurs at a different timestep so can contains overlapping sets of individuals.
@@ -18,7 +18,7 @@
 
 interaction_generation_seq<-function(pop_mat,indiv_data,
                                      ne=1000,mgs=2,style_gs=c("rep","pois"),
-                                     par=20,float=0.00001){
+                                     pm=20,float=0.00001){
 
   if(is.data.frame(indiv_data)==FALSE){stop("Correctly formatted indiv_data is required")}
   if(ncol(indiv_data)%in%c(4,5)==FALSE){stop("Correctly formatted indiv_data is required")}
@@ -28,7 +28,7 @@ interaction_generation_seq<-function(pop_mat,indiv_data,
   if(ne<1){stop("number of events must be 1 or more")}
   if(mgs<0){stop("mean group size must be greater than zero")}
   if(float<0){stop("float must be greater than zero")}
-  if(par<0){stop("par must be greater than zero")}
+  if(pm<0){stop("pm must be greater than zero")}
   if(float>0.01){warning("Float value is high. Interactions unlikely to be strongly linked to underlying network")}
 
   if(style_gs=="rep"){
@@ -50,7 +50,7 @@ interaction_generation_seq<-function(pop_mat,indiv_data,
       if(is.vector(t_mat)){
         join_probs<-t_mat+float
       } else{
-        join_probs<-apply(t_mat,2,jpc,par=par,float=float)
+        join_probs<-apply(t_mat,2,jpc,pm=pm,float=float)
       }
       if(length(can_join)>1){
         t_g[j]<-sample(can_join,1,replace=FALSE,prob=join_probs)

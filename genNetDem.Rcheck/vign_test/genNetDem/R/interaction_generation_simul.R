@@ -7,7 +7,7 @@
 #'@param mean_group_size mean group size. Defaults to 2.
 #'@param n_ts number of time-steps to simulate grouping events for. Defaults to 20.
 #'@param float used in jpc to provide a minimum probability of being sampled in the same group to allow all groups to be filled. Defaults to 0.000000001.
-#'@param par used in jpc to adjust social network connection strengths to probabilities of being sampled in the same group. Defaults to 50.
+#'@param pm used in jpc to adjust social network connection strengths to probabilities of being sampled in the same group. Defaults to 50.
 #'@param pow further adjustment of probabilities of being sampled in the same group based on social network connections. Defaults to 4.
 #'
 #'@details Generates groups that exist contemporaneously (c.f. interaction_generation_seq), whereby individuals are only present in a single group. Note that the functionality for having close control over the group size distribution is currently limited and could be improved. Group sizes could instead be generated directly from a series of breaks provided if more control is desired.
@@ -18,7 +18,7 @@
 
 interaction_generation_simul<-function(indiv_data,pop_mat,
                                        mean_group_size=2,n_ts=20,
-                                       float=0.000000001,par=50,pow=4){
+                                       float=0.000000001,pm=50,pow=4){
 
   if(is.data.frame(indiv_data)==FALSE){stop("Correctly formatted indiv_data is required")}
   if(ncol(indiv_data)%in%c(4,5)==FALSE){stop("Correctly formatted indiv_data is required")}
@@ -27,7 +27,7 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
   if(n_ts<1){stop("number of timesteps must be 1 or more")}
   if(mean_group_size<0){stop("mean group size must be greater than zero")}
   if(float<0){stop("float must be greater than zero")}
-  if(par<0){stop("par must be greater than zero")}
+  if(pm<0){stop("pm must be greater than zero")}
   if(float>0.01){warning("Float value is high. Interactions unlikely to be strongly linked to underlying network")}
 
   grs<-group_calc(nrow(indiv_data),mean_group_size)
@@ -49,7 +49,7 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
         if(is.vector(t_mat)){
           join_probs<-t_mat+float
         } else{
-          join_probs<-apply(t_mat,2,jpc,par=par,float=float)^pow
+          join_probs<-apply(t_mat,2,jpc,pm=pm,float=float)^pow
         }
         if(length(can_join)>1){
           t_g[j]<-sample(can_join,1,replace=FALSE,prob=join_probs)
@@ -86,7 +86,7 @@ interaction_generation_simul<-function(indiv_data,pop_mat,
           if(is.vector(t_mat)){
             join_probs<-t_mat+float
           } else{
-            join_probs<-apply(t_mat,2,jpc,par=par,float=float)^pow
+            join_probs<-apply(t_mat,2,jpc,pm=pm,float=float)^pow
           }
           if(length(can_join)>1){
             t_g[j]<-sample(can_join,1,replace=FALSE,prob=join_probs)

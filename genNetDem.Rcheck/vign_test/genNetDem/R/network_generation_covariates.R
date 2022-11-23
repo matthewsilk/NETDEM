@@ -37,9 +37,11 @@ network_generation_covariates<-function(indiv_data,dist_mat,indiv_info,
   if(p_ig<0|p_ig>1){stop("p_ig must be between zero and one")}
   if(wi_m<0|wi_m>1){stop("wi_m must bebetween zero and one")}
   if(wi_v<0){stop("wi_v must be greater than zero")}
+  if(wi_v>0.25){stop("wi_v must be less or equal to than 0.25")}
   if(p_og<0|p_og>1){stop("p_og must be between zero and one")}
   if(wo_m<0|wo_m>1){stop("w_og1 must be  between zero and one")}
   if(wo_v<0){stop("wo_v must be greater than zero")}
+  if(wo_v>0.25){stop("wo_v must be less than or equal to 0.25")}
 
   ################
   fn_sol <- function(x) {
@@ -119,6 +121,8 @@ network_generation_covariates<-function(indiv_data,dist_mat,indiv_info,
       }
     }
   }
+
+  if(sum(is.na(pop_mat))>0){{stop("NAs in adjacency matrix suggests difficulty fitting Beta distribution. Try reducing edge weight variance")}}
 
   pop_net<-igraph::graph.adjacency(pop_mat,mode="undirected",weighted=TRUE)
 
