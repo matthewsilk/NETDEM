@@ -1,0 +1,231 @@
+bird<-rep(seq(1,20,1),each=10)
+bird_ints<-rnorm(20,0,1)
+bird_slopes<-rnorm(20,0.25,0.75)
+
+since.arrival<-round(runif(200,-10,10))
+
+bill1<-rnorm(100,-1,0.5)
+bill2<-rnorm(100,1,0.5)
+
+bill<-c(bill1,bill2)
+
+logIR2<-rep(NA,200)
+for(i in 1:length(logIR2)){
+  logIR2[i]<-rnorm(1,bird_ints[bird[i]]+bill[i]+since.arrival[i]*bird_slopes[bird[i]],1)
+}
+
+godwit1<-data.frame(logIR2,bird,bill,since.arrival)
+
+library(brms)
+
+mod<-brm(bf(logIR2~bill+since.arrival+(since.arrival|bird), sigma~since.arrival), data=godwit1)
+summary(mod)
+
+summary(mod)
+
+str(mod)
+
+mod$ranef
+mod$model
+mod$save_pars
+mod$data
+mod$file
+mod$ranef
+
+mod$posterior
+mod$fit
+posterior_samples(mod)
+
+
+#######Here are some examples of plotting the results
+##Note that when I've indicated parts of the posterior its specific to my model and the number of pretend godwits I have
+##so you will have to change some of these indicators of column numbers to suit your data/model outputs
+
+test<-as.data.frame(mod$fit)
+
+##Plot of overall effect of since arrival of intake rate
+
+x<-seq(min(godwit1$bill),max(godwit1$bill),length.out=10000)
+
+#we extract the mean (you could use median if you prefer) for b_intercept and b_bill and create a line as wou would for a linear model
+y<-mean(test[,1])+mean(test[,3])*x
+
+plot(y~x,type="l",lwd=3,ylim=c(-10,10))
+
+#we can also add the raw data here
+points(x=godwit1$bill,y=godwit1$logIR2,pch=16,col="grey")
+
+#if we want to add credible intervals the process is a little more involved
+#with bayesian models one of the nicest things to do is actually plot separate lines from the posterior which you do like this
+
+plot(NULL,ylim=c(-12,12),xlim=c(-2.5,2.5))
+
+#note I am doing for 1000 out of 4000 here (which is already excessive). Play with the number to get a feel for what this is doing/how it is working
+#also note I'm just leaving x from above
+#note also I'm using partial transparency of the lines I draw
+for(i in 1:1000){
+  y<-test[i,1]+test[i,3]*x
+  lines(x,y,col=adjustcolor("grey",0.1))
+}
+
+#now plot the posterior mean
+y<-mean(test[,1])+mean(test[,3])*x
+lines(x,y,col="gray10",lwd=4)
+
+#and you could then add points if you want
+points(x=godwit1$bill,y=godwit1$logIR2,pch=16,col="gray10",cex=0.6)
+
+#hopefully this helps with how to plot from Bayesian models a little, and how to make the most of the posteriors for giving an idea
+#of uncertainty.
+
+##################################
+
+#we can do just the same for individual-level random effect estimates, it just gets a little more complicated
+
+#Now for each individual we need to make its line
+
+#Quick reminder of the dataframe we are working from
+head(test)
+
+#x is the same
+x<-seq(min(godwit1$bill),max(godwit1$bill),length.out=10000)
+
+#but our calculation for y is now longer. For bird 1 here we use:
+y<-mean(test[,1])+mean(test[,9])+(mean(test[,3])+mean(test[,29]))*x
+
+plot(y~x,type="l",lwd=3,ylim=c(-10,10),col="red")
+
+#Lets compare this individual to the population effect
+y2<-mean(test[,1])+mean(test[,3])*x #same code as before for the population
+lines(x,y2,col="gray10",lwd=4)
+
+
+##If we want we can even add some error around our individual with similar code to before
+
+plot(NULL,ylim=c(-12,12),xlim=c(-2.5,2.5))
+
+#note I am doing only 100 now to save time
+for(i in 1:100){
+  y<-test[i,1]+test[i,9]+(test[i,3]+test[i,29])*x
+  lines(x,y,col=adjustcolor("red",0.1))
+}
+
+#Now plot posterior mean for the individual
+y<-mean(test[,1])+mean(test[,9])+(mean(test[,3])+mean(test[,29]))*x
+lines(x,y,col="red",lwd=4)
+
+
+#and the population
+y2<-mean(test[,1])+mean(test[,3])*x
+lines(x,y2,col="gray10",lwd=4)
+
+#and you could then add points if you want
+points(x=godwit1$bill,y=godwit1$logIR2,pch=16,col="gray10",cex=0.6)
+
+#and how about turning points from the individual of interest red
+points(x=godwit1$bill[godwit1$bird==1],y=godwit1$logIR2[godwit1$bird==1],pch=16,col="red",cex=2)
+
+#####
+
+#Note we should probably just plot the estimates for the individual only within the range of its value
+#This just changes our x. Quick demonstration here (everything else the same)
+
+x2<-seq(min(godwit1$bill[godwit1$bird==1]),max(godwit1$bill[godwit1$bird==1]),length.out=10000)
+
+plot(NULL,ylim=c(-12,12),xlim=c(-2.5,2.5))
+
+#note I am doing only 100 now to save time
+for(i in 1:100){
+  y<-test[i,1]+test[i,9]+(test[i,3]+test[i,29])*x2
+  lines(x2,y,col=adjustcolor("red",0.1))
+}
+
+#Now plot posterior mean for the individual
+y<-mean(test[,1])+mean(test[,9])+(mean(test[,3])+mean(test[,29]))*x2
+lines(x2,y,col="red",lwd=4)
+
+
+#and the population
+y2<-mean(test[,1])+mean(test[,3])*x
+lines(x,y2,col="gray10",lwd=4)
+
+#and you could then add points if you want
+points(x=godwit1$bill,y=godwit1$logIR2,pch=16,col="gray10",cex=0.6)
+
+#and how about turning points from the individual of interest red
+points(x=godwit1$bill[godwit1$bird==1],y=godwit1$logIR2[godwit1$bird==1],pch=16,col="red",cex=2)
+
+
+#########################
+#########################
+
+#OK so that just laves multiple individuals....
+
+#First I'm going to create a color palette lazily (you may want to put more thought into what colors mean, this is just to give an example)
+library(viridis)
+
+cols<-viridis(length(unique(godwit1$bird)))
+
+#Now we are going to do what we did above but for each godwit separately as a loop
+
+gwits<-unique(godwit1$bird)
+n_gwits<-length(unique(godwit1$bird))
+
+plot(NULL,ylim=c(-12,12),xlim=c(-2.5,2.5))
+
+for(j in 1:n_gwits){
+  
+  x2<-seq(min(godwit1$bill[godwit1$bird==gwits[j]]),max(godwit1$bill[godwit1$bird==gwits[j]]),length.out=10000)
+  
+  #note I am doing only 100 now to save time
+  for(i in 1:100){
+    y<-test[i,1]+test[i,8+j]+(test[i,3]+test[i,28+j])*x2
+    lines(x2,y,col=adjustcolor(cols[j],0.1))
+  }
+  
+  #Now plot posterior mean for the individual
+  y<-mean(test[,1])+mean(test[,28+j])+(mean(test[,3])+mean(test[,28+j]))*x2
+  lines(x2,y,col=cols[j],lwd=4)
+  
+  #and how about turning points from the individual of interest red
+  points(x=godwit1$bill[godwit1$bird==gwits[j]],y=godwit1$logIR2[godwit1$bird==gwits[j]],pch=16,col=cols[j],cex=1)
+  
+  
+}
+
+#and the population
+y2<-mean(test[,1])+mean(test[,3])*x
+lines(x,y2,col="gray10",lwd=4)
+
+#############################
+
+##as you can see with 20 pretend godwits this makes an awful mess (perhaps less so if my pretend godwits' slopes differed more but even then)
+
+##So probably easiest to go just for the posterior means when you have many individuals
+
+
+gwits<-unique(godwit1$bird)
+n_gwits<-length(unique(godwit1$bird))
+
+plot(NULL,ylim=c(-12,12),xlim=c(-2.5,2.5))
+
+for(j in 1:n_gwits){
+  
+  x2<-seq(min(godwit1$bill[godwit1$bird==gwits[j]]),max(godwit1$bill[godwit1$bird==gwits[j]]),length.out=10000)
+  
+  #Now plot posterior mean for the individual
+  y<-mean(test[,1])+mean(test[,28+j])+(mean(test[,3])+mean(test[,28+j]))*x2
+  lines(x2,y,col=cols[j],lwd=4)
+  
+  #and how about turning points from the individual of interest red
+  points(x=godwit1$bill[godwit1$bird==gwits[j]],y=godwit1$logIR2[godwit1$bird==gwits[j]],pch=16,col=cols[j],cex=1)
+  
+  
+}
+
+#and the population
+y2<-mean(test[,1])+mean(test[,3])*x
+lines(x,y2,col="gray10",lwd=4)
+
+##########################
+############################
