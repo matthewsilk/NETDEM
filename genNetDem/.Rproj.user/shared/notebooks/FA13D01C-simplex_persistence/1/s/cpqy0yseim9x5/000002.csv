@@ -1,7 +1,0 @@
-"0",""
-"0","#simplicial set as hypergraph"
-"0","h<-matrix(0,nr=length(s_set),nc=n_id)"
-"0","for(i in 1:nrow(h)){"
-"0","  h[i,s_set[[i]]]<-1"
-"0","}"
-"0",""
