@@ -2,8 +2,8 @@
     "sortOrder": [
         {
             "columnIndex": 2,
-            "ascending": false
+            "ascending": true
         }
     ],
-    "path": "~/temp DESCRIPTION"
+    "path": "~/GitHub/NETDEM/genNetDem"
 }
