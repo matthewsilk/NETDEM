@@ -3,29 +3,14 @@
 
 # **genNetDem**
 
-**genNetDem** is an R package that generates longitudinal social
+**genNetDem** is an R package that that generates longitudinal social
 network and/or capture-recapture datasets with known underlying
 properties.
 
-## Bugs and Suggestions
+## Please go to the new version - <https://github.com/NETDEM-project/genNetDem>
 
-It is very difficult to develop a package that is robust to all types of
-datasets and user requirements. But we want to help. Please report any
-bugs or suggestions in the
-[Issues](https://github.com/matthewsilk/NETDEM/issues).
-
-## Installation
-
-**genNetDem** can be easily downloaded and installed from GitHub using
-`remotes::install_github()`. The vignettes available with the package
-can be downloaded by adding `build_vignettes = TRUE`.
-
-``` r
-# install genNetDem
-remotes::install_github("matthewsilk/NETDEM/genNetDem", build_vignettes = TRUE)
-```
-
-## Getting started
-
--   For an introduction to using **genNetDem**, see
-    `vignette("using genNetDem")`
+Due to installation issues from this repository, the repository for
+**genNetDem** has been moved to
+<https://github.com/NETDEM-project/genNetDem>. The version here will
+remain, but only as the initial version of the package, and will not be
+maintained or updated.
